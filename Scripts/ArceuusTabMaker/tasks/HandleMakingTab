@@ -22,8 +22,11 @@ import scripts.tabMaker.framework.Antiban;
 
 
 public class HandleMakingTab extends Task {
+
+	public RSArea DARK_LECTERN = new RSArea(new RSTile [] { new RSTile(1681, 3765, 0),new RSTile(1677, 3765, 0),new RSTile(1677, 3768, 0),new RSTile(1681, 3768, 0) });
+	public RSArea ARCEUUS_BANK = new RSArea(new RSTile [] { new RSTile(1638, 3753, 0),new RSTile(1633, 3753, 0),new RSTile(1633, 3749, 0),new RSTile(1626, 3750, 0),new RSTile(1626, 3753, 0),new RSTile(1621, 3753, 0),new RSTile(1621, 3736, 0),new RSTile(1638, 3736, 0) });
+	public RSArea ARCEUUS_CITY = new RSArea(new RSTile [] { new RSTile(1626, 3722, 0),new RSTile(1661, 3726, 0),new RSTile(1678, 3722, 0),new RSTile(1694, 3722, 0),new RSTile(1706, 3720, 0),new RSTile(1714, 3729, 0),new RSTile(1716, 3740, 0),new RSTile(1715, 3748, 0),new RSTile(1715, 3762, 0),new RSTile(1712, 3778, 0),new RSTile(1701, 3790, 0),new RSTile(1687, 3789, 0),new RSTile(1668, 3793, 0),new RSTile(1643, 3793, 0),new RSTile(1626, 3777, 0),new RSTile(1607, 3775, 0),new RSTile(1605, 3753, 0) });
 	
-	public RSArea DARK_LECTERN = new RSArea(null);
 	public RSObject[] lectern = Objects.findNearest(5, "Lectern");
 	public String[] RUNES = {
 			"Law rune",
