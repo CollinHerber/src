@@ -1,0 +1,181 @@
+package scripts.arceuusTabber.tasks;
+
+import org.tribot.api.types.generic.Filter;
+import org.tribot.api2007.Equipment;
+import org.tribot.api2007.Equipment.SLOTS;
+import org.tribot.api2007.Inventory;
+import org.tribot.api.Clicking;
+import org.tribot.api.General;
+import org.tribot.api.interfaces.Positionable;
+import org.tribot.api.util.abc.ABCUtil;
+import org.tribot.api2007.Objects;
+import org.tribot.api2007.Player;
+import org.tribot.api2007.Skills;
+import org.tribot.api2007.Skills.SKILLS;
+import org.tribot.api2007.ext.Filters;
+import org.tribot.api2007.types.RSArea;
+import org.tribot.api2007.types.RSObject;
+import org.tribot.api2007.types.RSTile;
+
+import scripts.dax_api.api_lib.DaxWalker;
+import scripts.dax_api.walker_engine.interaction_handling.AccurateMouse;
+import scripts.framework.Jamie_Task_Framework.Task;
+import scripts.framework.abc.PersistantABCUtil;
+
+public class HandleEssenceMining extends Task {
+	
+	 private long averageMiningWaitTime;
+	 private long lastMiningWaitTime;
+	 private long totalMiningWaitTime;
+	 private long totalMiningInstances;
+
+	// public RSArea AGILITY_LVL73_SHORTCUT_WEST = new RSArea(new RSTile [] { new RSTile(1742, 3856, 0),new RSTile(1739, 3856, 0),new RSTile(1739, 3851, 0),new RSTile(1742, 3851, 0) });
+	// public RSArea AGILITY_LVL73_SHORTCUT_EAST = new RSArea(new RSTile [] { new RSTile(1752, 3852, 0),new RSTile(1752, 3856, 0),new RSTile(1754, 3856, 0),new RSTile(1754, 3852, 0) });
+	public RSArea AGILITY_LVL67_SHORTCUT_NORTH = new RSArea(new RSTile [] { new RSTile(1763, 3878, 0),new RSTile(1763, 3876, 0),new RSTile(1762, 3876, 0),new RSTile(1761, 3874, 0),new RSTile(1760, 3876, 0),new RSTile(1759, 3876, 0),new RSTile(1759, 3878, 0),new RSTile(1761, 3879, 0) });
+	public RSArea AGILITY_LVL67_SHORTCUT_SOUTH = new RSArea(new RSTile [] { new RSTile(1761, 3872, 0),new RSTile(1761, 3870, 0) });
+	public RSArea DENSE_ESSENCE_AREA = new RSArea(new RSTile [] { new RSTile(1764, 3849, 0),new RSTile(1767, 3848, 0),new RSTile(1768, 3846, 0),new RSTile(1767, 3844, 0),new RSTile(1766, 3842, 0),new RSTile(1764, 3843, 0),new RSTile(1762, 3844, 0),new RSTile(1760, 3845, 0),new RSTile(1757, 3845, 0),new RSTile(1756, 3847, 0),new RSTile(1755, 3849, 0),new RSTile(1757, 3851, 0),new RSTile(1760, 3851, 0),new RSTile(1762, 3851, 0) });
+	public RSArea AFTER_AGILITY_SHORTCUT = new RSArea(new RSTile [] { new RSTile(1771, 3849, 0),new RSTile(1764, 3842, 0),new RSTile(1754, 3840, 0),new RSTile(1750, 3848, 0),new RSTile(1749, 3855, 0),new RSTile(1751, 3864, 0),new RSTile(1759, 3871, 0),new RSTile(1770, 3871, 0),new RSTile(1776, 3863, 0),new RSTile(1772, 3857, 0) });
+	
+	// public RSObject[] AGILITY_LVL_73_OBSTICLE = Objects.find(20, 27984);
+	public RSObject[] AGILITY_LVL_67_OBSTICLE = Objects.find(20, 1973);			
+	
+	
+	public RSObject ore;
+	public RSObject[] ores;
+		
+	
+	@Override
+	public String status() {
+		return "Mining Esscence" + " Status: " + getTaskState().name();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return Inventory.find(Filters.Items.nameContains(" pickaxe")).length > 0 && Inventory.find(Filters.Items.nameEquals("Chisel")).length > 0; // || Equipment.getItem(SLOTS.WEAPON).Filters.Items.nameContains(" pickaxe").length > 0;
+																				// try to add this at a later date
+	}
+
+	@Override
+	public void process() {
+
+		switch (getTaskState()) {
+		
+		case WALK_TO_AGILITY_SHORTCUT:
+			
+			if (Skills.getActualLevel(SKILLS.AGILITY) >= 67) {
+				DaxWalker.walkTo(AGILITY_LVL67_SHORTCUT_NORTH.getRandomTile());
+				
+				while (Player.isMoving()) {
+				PersistantABCUtil.handleIdleActions();
+				
+				}
+			}
+			//	else if (Skills.getActualLevel(SKILLS.AGILITY) >= 73) {
+			//		DaxWalker.walkTo(AGILITY_LVL73_SHORTCUT_WEST.getRandomTile());
+					
+			//		while (Player.isMoving()) {
+			//			PersistantABCUtil.handleIdleActions();
+			//		}
+			//	}
+					else if (Skills.getActualLevel(SKILLS.AGILITY) < 67) {
+						DaxWalker.walkTo(DENSE_ESSENCE_AREA.getRandomTile());
+						System.out.println("Required agility level not met, walking to dense essence area."
+											+ "Improving agility will speed this process up.");
+						
+						while(Player.isMoving()) {
+							PersistantABCUtil.handleIdleActions();
+						}
+					}
+			break;
+			
+		case HANDLE_AGILITY_SHORTCUT: // find the correct names  of the obsticles and the correct words to perform the action
+			
+		//	if (AGILITY_LVL73_SHORTCUT_WEST.contains(Player.getPosition())) {
+		//		Clicking.click("Climb", AGILITY_LVL_73_OBSTICLE);
+		//		General.sleep(1400, 2500);
+		//	} 
+				Clicking.click("Climb", AGILITY_LVL_67_OBSTICLE);
+				General.sleep(1400, 2500);
+			
+			break;
+			
+		case WALK_TO_ESSENCE:
+			
+				DaxWalker.walkTo(DENSE_ESSENCE_AREA.getRandomTile());
+				
+				while (Player.isMoving()) {
+					PersistantABCUtil.handleIdleActions();
+			}
+			
+			break;
+			
+		case MINE_ESSENCE:
+			
+			ores = Objects.findNearest(20, "Dense runestone");
+
+			if (ore != null) {
+				
+				if (AccurateMouse.click(ore, "Chip")) {
+					PersistantABCUtil.get().generateSupportingTrackerInfo((int) averageMiningWaitTime);
+					
+					while (Player.getAnimation() != -1) {
+						General.sleep(2000, 3000);
+					}
+				}
+				
+			}
+			
+			break;
+		
+		case IDLE_WHILE_MINING:
+			
+			long timeStarted = System.currentTimeMillis();
+            while (Player.getAnimation() != -1) {
+            	PersistantABCUtil.handleIdleActions();
+            }
+            PersistantABCUtil.get().generateAndSleep((int) lastMiningWaitTime);
+            updateStatistics(timeStarted);
+            break;
+		}
+	}
+
+	private enum TaskState {
+		
+		WALK_TO_AGILITY_SHORTCUT,
+		HANDLE_AGILITY_SHORTCUT,
+		WALK_TO_ESSENCE,
+		MINE_ESSENCE,
+		IDLE_WHILE_MINING
+	}
+	
+    private TaskState getTaskState() {
+
+        if (!AGILITY_LVL67_SHORTCUT_NORTH.contains(Player.getPosition()) && !AFTER_AGILITY_SHORTCUT.contains(Player.getPosition())) {
+            return TaskState.WALK_TO_AGILITY_SHORTCUT;
+        }
+
+        if (AGILITY_LVL67_SHORTCUT_NORTH.contains(Player.getPosition())) {
+            return TaskState.HANDLE_AGILITY_SHORTCUT;
+        }
+
+        if (AGILITY_LVL67_SHORTCUT_SOUTH.contains(Player.getPosition())) {
+            return TaskState.WALK_TO_ESSENCE;
+        }
+        
+        if (Player.getAnimation() != -1 && ore != null) {
+        	return TaskState.MINE_ESSENCE;
+        	
+        }	
+
+        return TaskState.IDLE_WHILE_MINING;
+    }	
+
+    private void updateStatistics(long timeStarted) {
+        lastMiningWaitTime = System.currentTimeMillis() - timeStarted;
+        totalMiningInstances++;
+        totalMiningWaitTime += lastMiningWaitTime;
+        averageMiningWaitTime = totalMiningWaitTime / totalMiningInstances;
+    }
+	
+}
+
