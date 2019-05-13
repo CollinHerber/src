@@ -1,0 +1,168 @@
+package scripts.arceuusTabber.tasks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.tribot.api.Clicking;
+import org.tribot.api.General;
+import org.tribot.api2007.Banking;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.Objects;
+import org.tribot.api2007.Player;
+import org.tribot.api2007.types.RSArea;
+import org.tribot.api2007.types.RSInterface;
+import org.tribot.api2007.types.RSObject;
+import org.tribot.api2007.types.RSTile;
+
+import scripts.dax_api.api_lib.DaxWalker;
+import scripts.framework.Jamie_Task_Framework.Task;
+import scripts.framework.abc.ACamera;
+import scripts.framework.abc.PersistantABCUtil;
+import scripts.tabMaker.framework.Antiban;
+
+
+public class HandleMakingTab extends Task {
+	
+	public RSArea DARK_LECTERN = new RSArea(null);
+	public RSObject[] lectern = Objects.findNearest(5, "Lectern");
+	public String[] RUNES = {
+			"Law rune",
+			"Blood rune",
+			"Death rune",
+			"Earth rune",
+			"Water rune",
+			"Mind rune",
+			"Soul rune"
+			
+	};
+	public String[] DARK_ESSENCE = {
+			"Dark essence block"
+	};
+	List<Integer> abc2WaitTimes = new ArrayList<>();
+	private ACamera aCamera = new ACamera(this);
+    private long lastMakingWaitTime;
+    private long averageMakingWaitTime;
+    private long totalMakingWaitTime;
+    private long totalMakingInstances;
+
+	@Override
+	public String status() {
+		return "Making Tablets" + "Status:" + getTaskState().name();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return Banking.find("Dark essence block").length >= 1000; // add customisation to this number so can swap every x amount
+	}
+
+	@Override
+	public void process() {
+
+		switch (getTaskState()) {
+		
+		case WALK_TO_BANK:
+			
+			DaxWalker.walkToBank();
+			while (Player.isMoving()) {
+				
+				Antiban.randomMovement();
+				
+			} General.random(1200, 2400);
+			
+			break;
+		
+		case WITHDRAW_MATERIALS: // need to do this so it takes the 
+			
+			if (Inventory.find(RUNES).length >= 0) { 
+				
+				Banking.openBank();
+				
+				Banking.withdraw(25, DARK_ESSENCE);
+				General.println("You have the required runes, in your inventory");
+				Antiban.randomBankAfk();
+
+			}
+
+			General.sleep(1200, 2500);
+			
+			if (Inventory.find(RUNES).length > 1 && Inventory.find(DARK_ESSENCE).length >= 25) {
+				Banking.close();
+				Antiban.randomBankAfk();
+			}
+			
+			break;
+			
+		case WALK_TO_LECTERN:
+			
+			DaxWalker.walkTo(DARK_LECTERN.getRandomTile());
+			while (Player.isMoving()) {
+				PersistantABCUtil.handleIdleActions();
+			}
+		General.random(1200, 3000);
+		
+		break;
+		
+		case MAKE_TABS:
+			
+			Clicking.click("Study", lectern);
+			while (Player.isMoving()) {
+				abc2WaitTimes.add(Antiban.getReactionTime());
+				Antiban.sleepReactionTime();
+				General.println("ABCv2: Sleeping for generated reaction time");
+			}
+			// add the interface steps here based upon the arceuusInfo class file (so unique interface ID's per selected tab to make) 
+			
+			break;
+			
+		case IDLE_WHILE_MAKING:
+			
+			 long timeStarted = System.currentTimeMillis();
+	           
+	            while (Player.getAnimation() != -1) { 
+	            	PersistantABCUtil.handleIdleActions();
+	            	if (PersistantABCUtil.handleIdleActions() == true); 
+	            	System.out.println("Performing Idle Actions");
+	            			aCamera.setCameraRotation(25);
+	            			System.out.println("Rotating Camera");
+	            }
+	            PersistantABCUtil.get().generateAndSleep((int) lastMakingWaitTime);
+	            updateStatistics(timeStarted);
+	            break;
+			} 
+	}
+	
+	private enum TaskState {
+		
+		WALK_TO_BANK,
+		WITHDRAW_MATERIALS,
+		WALK_TO_LECTERN,
+		MAKE_TABS,
+		IDLE_WHILE_MAKING
+		
+	}
+	
+	private TaskState getTaskState() {
+		
+		if (Inventory.find(DARK_ESSENCE).length == 0) {
+			return TaskState.WALK_TO_BANK;
+	}
+		if (Banking.isInBank() && Inventory.find(DARK_ESSENCE).length == 0) {
+			return TaskState.WITHDRAW_MATERIALS;
+	}
+		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1) {
+			return TaskState.WALK_TO_LECTERN;
+	}
+		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1 && DARK_LECTERN.contains(Player.getPosition())) {
+			return TaskState.MAKE_TABS;
+	}
+	return TaskState.IDLE_WHILE_MAKING;
+	
+	}
+	
+    private void updateStatistics(long timeStarted) {
+        lastMakingWaitTime = System.currentTimeMillis() - timeStarted;
+        totalMakingInstances++;
+        totalMakingWaitTime += lastMakingWaitTime;
+        averageMakingWaitTime = totalMakingWaitTime / totalMakingInstances;
+    }
+}
