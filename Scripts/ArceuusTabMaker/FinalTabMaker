@@ -38,7 +38,7 @@ public class FinalTabMaker extends Script implements Painting {
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
             public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
+                return new DaxCredentials("", "PUBLIC-KEY"); // add own public key
             }
         }
         );
