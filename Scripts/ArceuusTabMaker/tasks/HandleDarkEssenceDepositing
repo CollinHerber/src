@@ -1,0 +1,126 @@
+package scripts.arceuusTabber.tasks;
+
+import org.tribot.api.General;
+import org.tribot.api2007.Banking;
+import org.tribot.api2007.GameTab;
+import org.tribot.api2007.Interfaces;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.Player;
+import org.tribot.api2007.types.RSArea;
+import org.tribot.api2007.types.RSInterfaceChild;
+import org.tribot.api2007.types.RSTile;
+
+import scripts.dax_api.api_lib.DaxWalker;
+import scripts.framework.Jamie_Task_Framework.Task;
+import scripts.framework.abc.PersistantABCUtil;
+import scripts.tabMaker.framework.Antiban;
+
+public class HandleDarkEssenceDepositing extends Task{
+	
+	public String[] bank = {
+			"Dark essence block"
+	};
+	
+	public String[] notBank = {
+			" pickaxe",
+			"Chisel"
+	};
+	
+	public RSArea WINTERTODT = new RSArea(null);
+
+	@Override
+	public String status() {
+		return "Banking" + "Status: " + getTaskState().name();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return Inventory.find(bank).length == 26;
+	}
+
+	@Override
+	public void process() {
+		
+		switch (getTaskState()) {
+		
+		case TELEPORT_TO_WINTERTODT:
+			
+			teleportToWintertodt();
+	
+		break;
+		
+		case WALK_TO_BANK:
+			
+			DaxWalker.walkToBank();
+			
+		break;
+		
+		case DEPOSIT_ITEMS:
+			
+			PersistantABCUtil.getBankPreference();
+			
+			if (!Banking.isBankScreenOpen()) {
+				Banking.openBank();
+			}
+			else if (Banking.isBankScreenOpen() && Banking.isBankLoaded()) {
+				Banking.depositAllExcept(notBank);
+			}	
+			General.random(500, 900);
+	
+		break;
+		
+		case CLOSE_BANK:
+			
+			Banking.close();
+			
+			break;
+			
+		case AFK_AFTER_BANK:
+			
+			Antiban.randomBankAfk();
+		}
+	}
+
+	
+	private enum TaskState {
+		TELEPORT_TO_WINTERTODT,
+		WALK_TO_BANK,
+		DEPOSIT_ITEMS,
+		CLOSE_BANK,
+		AFK_AFTER_BANK
+	}
+	
+	private TaskState getTaskState() {
+		
+		if (Inventory.isFull()) {
+			return TaskState.TELEPORT_TO_WINTERTODT;
+		}
+		
+		if (WINTERTODT.contains(Player.getPosition())) {
+			return TaskState.WALK_TO_BANK;
+		}
+			
+		if (Banking.isInBank())	{
+			return TaskState.DEPOSIT_ITEMS;
+		}
+		
+		if (!Inventory.isFull() && Banking.isBankScreenOpen()) {
+			return TaskState.CLOSE_BANK;
+		}
+		
+		General.println("Successfully deposited items");
+		return TaskState.AFK_AFTER_BANK;
+	}
+	
+	private void teleportToWintertodt() {
+		
+		if (GameTab.open(GameTab.TABS.EQUIPMENT)) {
+			
+			RSInterfaceChild neckSlot = Interfaces.get(387, 8);
+			
+			if (neckSlot != null && neckSlot.click("Wintertodt Camp"));
+			
+		} General.sleep(1200, 1900);
+	} 
+	
+}
