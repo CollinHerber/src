@@ -1,0 +1,45 @@
+package scripts.arceuusTabber.data;
+
+
+public enum arceuusInfo {
+
+
+	LUMBRIDGE_GRAVEYARD	(6,		"Law rune", 	1, 	"Earth rune", 	2,	"", 			0,	1111,	1111,	1111),
+	DRAYNOR_MANOR		(17,	"Law rune", 	1, 	"Water rune", 	1, 	"Earth rune", 	1,	1111,	1111,	1111),
+	BATTLEFRONT			(23,	"Law rune", 	1, 	"Earth rune", 	1, 	"Fire rune", 	1,	1111,	1111,	1111),
+	MIND_ALTAR			(28,	"Law rune", 	1, 	"Mind rune", 	2, 	"", 			0,	1111,	1111,	1111),
+	RESPAWN				(34, 	"Law rune", 	1, 	"Soul rune", 	1, 	"", 			0,	1111,	1111,	1111),
+	SALVE_GRAVEYARD		(40, 	"Law rune", 	1, 	"Soul rune", 	2, 	"", 			0,	1111,	1111,	1111),
+	FENKENSTRAIN_CASTLE	(48, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Earth rune", 	1,	1111,	1111,	1111),
+	WEST_ARDOUGNE		(61, 	"Law rune", 	2, 	"Soul rune", 	2, 	"", 			0,	1111,	1111,	1111),
+	HARMONY_ISLAND		(65, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Nature rune", 	1,	1111,	1111,	1111),
+	CEMETRY				(71, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Blood rune", 	1,	1111,	1111,	1111),
+	BARROWS				(83,	"Law rune",		2,	"Soul rune",	2,	"Blood rune",	1,	1111,	1111,	1111),
+	APE_ATOLL			(90,	"Law rune",		2,	"Soul rune",	2, 	"Blood rune",	2,	1111,	1111,	1111);
+	 
+	
+	int levelRequired;
+    String runeID1;
+    int rune1Quantity;
+    String runeID2;
+    int rune2Quantity;
+    String runeID3;
+    int rune3Quantity;
+    int interfaceParent;
+    int interfaceChild;
+    int interfaceComponent;
+    
+    arceuusInfo(int levelRequired, String runeID1, int rune1Quantity, String runeID2, int rune2Quantity, String runeID3, int rune3Quantity, int interfaceParent, int interfaceChild, int interfaceComponent) {
+        this.levelRequired = levelRequired;
+        this.runeID1 = runeID1;
+        this.rune1Quantity = rune1Quantity;
+        this.runeID2 = runeID2;
+        this.rune2Quantity = rune2Quantity;
+        this.runeID3 = runeID3;
+        this.rune3Quantity = rune3Quantity;
+        this.interfaceParent = interfaceParent;
+        this.interfaceChild = interfaceChild;
+        this.interfaceComponent = interfaceComponent;
+    }
+		
+}
