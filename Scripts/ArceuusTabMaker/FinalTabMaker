@@ -1,1 +1,106 @@
+package scripts.arceuusTabber;
 
+import org.tribot.api.General;
+import org.tribot.api.Timing;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.Skills;
+import org.tribot.api2007.Skills.SKILLS;
+import org.tribot.script.Script;
+import org.tribot.script.ScriptManifest;
+import org.tribot.script.interfaces.Painting;
+
+import scripts.arceuusTabber.data.vars;
+import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
+import scripts.arceuusTabber.tasks.HandleEssenceMining;
+import scripts.arceuusTabber.tasks.HandleMakingDarkEssence;
+import scripts.arceuusTabber.tasks.HandleMakingTab;
+import scripts.dax_api.api_lib.DaxWalker;
+import scripts.dax_api.api_lib.models.DaxCredentials;
+import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
+import scripts.framework.Jamie_Task_Framework.Task;
+
+import java.awt.*;
+import java.util.ArrayList;
+
+@ScriptManifest(category = "Money Making", name = "FArceuusTabMaker", authors = "flamekiller999")
+public class FinalTabMaker extends Script implements Painting {
+
+	private static final long startTime = System.currentTimeMillis();
+	private int startLvl = Skills.getActualLevel(SKILLS.MAGIC);
+	private int startTabs = Inventory.getCount("");
+	private int startXP = Skills.getXP(SKILLS.MAGIC);
+
+    private ArrayList<Task> tasks = new ArrayList<>();
+
+    @Override
+    public void run() {
+    	
+        DaxWalker.setCredentials(new DaxCredentialsProvider() {
+            @Override
+            public DaxCredentials getDaxCredentials() {
+                return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
+            }
+        }
+        );
+
+        addTasks();
+
+        while (vars.get().shouldRun){
+            handleTasks();
+
+        }
+
+    }
+
+    private void addTasks() {
+    	
+        tasks.add(new HandleEssenceMining());
+        tasks.add(new HandleDarkEssenceDepositing());
+        tasks.add(new HandleMakingDarkEssence());
+        tasks.add(new HandleMakingTab());
+        
+    }
+
+    private void handleTasks(){
+        for (Task t : tasks){
+            if (t.canProcess()){
+                vars.get().status = t.status();
+                t.process();
+                General.sleep(100, 250);
+                break;
+            }
+        }
+    }
+
+    public static void stopScript(String reason){
+        General.println("Script stopped : " + reason);
+        vars.get().shouldRun = false;
+    }
+
+    @Override
+    public void onPaint(Graphics g) {
+    	
+    	int currentLvl = Skills.getActualLevel(SKILLS.MAGIC);
+    	int gainedLvl = currentLvl - startLvl;
+        long timeRan = System.currentTimeMillis() - startTime;
+        int gainedXP = Skills.getXP(SKILLS.MAGIC) - startXP;
+        int xpToLevel = Skills.getXPToNextLevel(SKILLS.MAGIC);
+        long xpPerHour = (gainedXP * 3600000 / timeRan);
+        int currentTabs = Inventory.getCount("Teleport to house");
+        int gainedTabs = startTabs - currentTabs;
+        long tabsPerHour = (gainedTabs * 3600000 / timeRan);
+
+        
+
+        g.setColor(Color.WHITE);
+
+        g.drawString("FArceuusTabMaker v0.00", 10, 250);
+        g.drawString("Runtime: " + Timing.msToString(timeRan), 10, 265);
+        g.drawString("Status: " + vars.get().status, 10, 280);
+        g.drawString("Level: " + Skills.getCurrentLevel(Skills.SKILLS.MAGIC) + "(+" + gainedLvl + ")", 10, 295);
+        g.drawString("% to level: " + Skills.getPercentToNextLevel(Skills.SKILLS.MAGIC), 10, 310);
+        g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325); 
+        g.drawString("Tabs Made:" + gainedTabs + "(" + tabsPerHour + ")" ,  10, 340);
+    }
+    
+}
