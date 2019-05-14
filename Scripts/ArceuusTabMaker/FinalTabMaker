@@ -11,7 +11,9 @@ import org.tribot.script.interfaces.Arguments;
 import org.tribot.script.interfaces.Painting;
 
 import scripts.arceuusTabber.data.arceuusInfo;
+import scripts.arceuusTabber.data.arceuusInfo.amountToMake;
 import scripts.arceuusTabber.data.vars;
+import scripts.arceuusTabber.tasks.EnumName;
 import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
 import scripts.arceuusTabber.tasks.HandleEssenceMining;
 import scripts.arceuusTabber.tasks.HandleMakingDarkEssence;
@@ -20,6 +22,7 @@ import scripts.dax_api.api_lib.DaxWalker;
 import scripts.dax_api.api_lib.models.DaxCredentials;
 import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
 import scripts.framework.Jamie_Task_Framework.Task;
+import scripts.framework.abc.ACamera;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -30,13 +33,17 @@ public class FinalTabMaker extends Script implements Painting, Arguments {
 
 	private static final long startTime = System.currentTimeMillis();
 	private int startLvl = Skills.getActualLevel(SKILLS.MAGIC);
-	private int startTabs = Inventory.getCount("");
+	private int startTabs = Inventory.getCount(" teleport");
 	private int startXP = Skills.getXP(SKILLS.MAGIC);
 
     private ArrayList<Task> tasks = new ArrayList<>();
 
-    public arceuusInfo tabToUse;
-        
+    public static arceuusInfo tabToUse;
+    public amountToMake QUANTITY;
+     
+    public static arceuusInfo tabType;
+    public static int changeAt;
+    
     @Override
     public void run() {
     	
@@ -91,7 +98,7 @@ public class FinalTabMaker extends Script implements Painting, Arguments {
         int gainedXP = Skills.getXP(SKILLS.MAGIC) - startXP;
         int xpToLevel = Skills.getXPToNextLevel(SKILLS.MAGIC);
         long xpPerHour = (gainedXP * 3600000 / timeRan);
-        int currentTabs = Inventory.getCount("Teleport to house");
+        int currentTabs = Inventory.getCount(" teleport");
         int gainedTabs = startTabs - currentTabs;
         long tabsPerHour = (gainedTabs * 3600000 / timeRan);
 
@@ -108,8 +115,8 @@ public class FinalTabMaker extends Script implements Painting, Arguments {
         g.drawString("Tabs Made:" + gainedTabs + "(" + tabsPerHour + ")" ,  10, 340);
     }
 
-	@Override
-	public void passArguments(HashMap<String, String> hashMap) {
+	 @Override
+	 public void passArguments(HashMap<String,  String> hashMap) {
 	    String argumentString = hashMap.get("custom_input"); //user inputted argument check
         if(argumentString ==  null || argumentString.isEmpty()){ //if that's empty
             argumentString = hashMap.get("autostart");       //check for auto-started argument instead
@@ -117,10 +124,21 @@ public class FinalTabMaker extends Script implements Painting, Arguments {
 
         if(argumentString != null && !argumentString.isEmpty()){ //make sure the argument was entered
             tabToUse = arceuusInfo.valueOf(argumentString);           //get the Tab object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
+            QUANTITY = amountToMake.valueOf(argumentString);
         }else{                                                  //argument string is empty
             General.println("No tabs selected in arguments!");  //let user know missing argument
         }
     }
+	    private void argVoid() {
+	        // handle args
+	        if (tabToUse.containsKey() {
+	            tabType = arceuusInfo.valueOf(tabToUse.get(String));
+	        }
+	        
+	        if (QUANTITY.containsKey("changeAt"){
+	            changeAt = Integer.valueOf(QUANTITY.get(int);
+	        }
+	    }
 }
     
 
