@@ -7,8 +7,10 @@ import org.tribot.api2007.Skills;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
+import org.tribot.script.interfaces.Arguments;
 import org.tribot.script.interfaces.Painting;
 
+import scripts.arceuusTabber.data.arceuusInfo;
 import scripts.arceuusTabber.data.vars;
 import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
 import scripts.arceuusTabber.tasks.HandleEssenceMining;
@@ -21,9 +23,10 @@ import scripts.framework.Jamie_Task_Framework.Task;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @ScriptManifest(category = "Money Making", name = "FArceuusTabMaker", authors = "flamekiller999")
-public class FinalTabMaker extends Script implements Painting {
+public class FinalTabMaker extends Script implements Painting, Arguments {
 
 	private static final long startTime = System.currentTimeMillis();
 	private int startLvl = Skills.getActualLevel(SKILLS.MAGIC);
@@ -32,13 +35,15 @@ public class FinalTabMaker extends Script implements Painting {
 
     private ArrayList<Task> tasks = new ArrayList<>();
 
+    public arceuusInfo tabToUse;
+        
     @Override
     public void run() {
     	
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
             public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("", "PUBLIC-KEY"); // add own public key
+                return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
             }
         }
         );
@@ -49,7 +54,7 @@ public class FinalTabMaker extends Script implements Painting {
             handleTasks();
 
         }
-
+        General.println("The selected tablet is: " + tabToUse.name());
     }
 
     private void addTasks() {
@@ -102,5 +107,20 @@ public class FinalTabMaker extends Script implements Painting {
         g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325); 
         g.drawString("Tabs Made:" + gainedTabs + "(" + tabsPerHour + ")" ,  10, 340);
     }
-    
+
+	@Override
+	public void passArguments(HashMap<String, String> hashMap) {
+	    String argumentString = hashMap.get("custom_input"); //user inputted argument check
+        if(argumentString ==  null || argumentString.isEmpty()){ //if that's empty
+            argumentString = hashMap.get("autostart");       //check for auto-started argument instead
+        }
+
+        if(argumentString != null && !argumentString.isEmpty()){ //make sure the argument was entered
+            tabToUse = arceuusInfo.valueOf(argumentString);           //get the Rune object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
+        }else{                                                  //argument string is empty
+            General.println("No tabs selected in arguments!");  //let user know missing argument
+        }
+    }
 }
+    
+
