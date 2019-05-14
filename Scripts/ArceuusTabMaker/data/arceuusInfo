@@ -1,44 +1,67 @@
 package scripts.arceuusTabber.data;
 
-
 public enum arceuusInfo {
 
+	LUMBRIDGE_GRAVEYARD(6, "Law rune", 1, "Earth rune", 2, "", 0, 264, 25),
+	DRAYNOR_MANOR(17, "Law rune", 1, "Water rune", 1, "Earth rune", 1, 264, 27),
+	BATTLEFRONT(23, "Law rune", 1, "Earth rune", 1, "Fire rune", 1, 264, 29),
+	MIND_ALTAR(28, "Law rune", 1, "Mind rune", 2, "", 0, 264, 31),
+	SALVE_GRAVEYARD(40, "Law rune", 1, "Soul rune", 2, "", 0, 264, 33),
+	FENKENSTRAIN_CASTLE(48, "Law rune", 1, "Soul rune", 1, "Earth rune", 1, 264, 35),
+	WEST_ARDOUGNE(61, "Law rune", 2, "Soul rune", 2, "", 0, 264, 37),
+	HARMONY_ISLAND(65, "Law rune", 1, "Soul rune", 1, "Nature rune", 1, 264, 39),
+	CEMETRY(71, "Law rune", 1, "Soul rune", 1, "Blood rune", 1, 264, 41),
+	BARROWS(83, "Law rune", 2, "Soul rune", 2, "Blood rune", 1, 264, 43),
+	APE_ATOLL(90, "Law rune", 2, "Soul rune", 2, "Blood rune", 2, 264, 44);
 
-	LUMBRIDGE_GRAVEYARD	(6,	"Law rune", 	1, 	"Earth rune", 	2,	"", 		0,	264,	25),
-	DRAYNOR_MANOR		(17,	"Law rune", 	1, 	"Water rune", 	1, 	"Earth rune", 	1,	264,	27),
-	BATTLEFRONT		(23,	"Law rune", 	1, 	"Earth rune", 	1, 	"Fire rune", 	1,	264,	29),
-	MIND_ALTAR		(28,	"Law rune", 	1, 	"Mind rune", 	2, 	"", 		0,	264,	31),
-	SALVE_GRAVEYARD		(40, 	"Law rune", 	1, 	"Soul rune", 	2, 	"", 		0,	264,	33),
-	FENKENSTRAIN_CASTLE	(48, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Earth rune", 	1,	264,	35),
-	WEST_ARDOUGNE		(61, 	"Law rune", 	2, 	"Soul rune", 	2, 	"", 		0,	264,	37),
-	HARMONY_ISLAND		(65, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Nature rune", 	1,	264,	39),
-	CEMETRY			(71, 	"Law rune", 	1, 	"Soul rune", 	1, 	"Blood rune", 	1,	264,	41),
-	BARROWS			(83,	"Law rune",	2,	"Soul rune",	2,	"Blood rune",	1,	264,	43),
-	APE_ATOLL		(90,	"Law rune",	2,	"Soul rune",	2, 	"Blood rune",	2,	264,	44);
-	 
+	public int levelRequired;
+	public String runeID1;
+	public int rune1Quantity;
+	public String runeID2;
+	public int rune2Quantity;
+	public String runeID3;
+	public int rune3Quantity;
+	public int interfaceParent;
+	public int interfaceChild;
+
+	arceuusInfo(int levelRequired, String runeID1, int rune1Quantity, String runeID2, int rune2Quantity, String runeID3,
+			int rune3Quantity, int interfaceParent, int interfaceChild) {
+		this.levelRequired = levelRequired;
+		this.runeID1 = runeID1;
+		this.rune1Quantity = rune1Quantity;
+		this.runeID2 = runeID2;
+		this.rune2Quantity = rune2Quantity;
+		this.runeID3 = runeID3;
+		this.rune3Quantity = rune3Quantity;
+		this.interfaceParent = interfaceParent;
+		this.interfaceChild = interfaceChild;
+	}
+
+public enum amountToMake {
 	
-	int levelRequired;
-    String runeID1;
-    int rune1Quantity;
-    String runeID2;
-    int rune2Quantity;
-    String runeID3;
-    int rune3Quantity;
-    int interfaceParent;
-    int interfaceChild;
-    // int interfaceComponent; not needed
-    
-    arceuusInfo(int levelRequired, String runeID1, int rune1Quantity, String runeID2, int rune2Quantity, String runeID3, int rune3Quantity, int interfaceParent, int interfaceChild) { // int interfaceComponent
-        this.levelRequired = levelRequired;
-        this.runeID1 = runeID1;
-        this.rune1Quantity = rune1Quantity;
-        this.runeID2 = runeID2;
-        this.rune2Quantity = rune2Quantity;
-        this.runeID3 = runeID3;
-        this.rune3Quantity = rune3Quantity;
-        this.interfaceParent = interfaceParent;
-        this.interfaceChild = interfaceChild;
-        // this.interfaceComponent = interfaceComponent;
-    }
+	ONE (100),
+	TWO (200),
+	THREE (300),
+	FOUR (400),
+	FIVE (500),
+	SIX (600),
+	SEVEN (700),
+	EIGHT (800),
+	NINE (900),
+	TEN (1000),
+	ELEVEN (1100),
+	TWELVE (1200),
+	THIRTEEN (1300),
+	FOURTEEN (1400),
+	FIFTEEN (1500);
+	
+	public int amount;
+	
+	amountToMake(int amount) {
 		
+		this.amount = amount;
+		
+	}
+	
+}
 }
