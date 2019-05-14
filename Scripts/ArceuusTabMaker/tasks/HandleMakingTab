@@ -1,183 +1,144 @@
-package scripts.arceuusTabber.tasks;
+package scripts.arceuusTabber;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api2007.Banking;
-import org.tribot.api2007.Interfaces;
+import org.tribot.api.Timing;
 import org.tribot.api2007.Inventory;
-import org.tribot.api2007.Objects;
-import org.tribot.api2007.Player;
-import org.tribot.api2007.types.RSArea;
-import org.tribot.api2007.types.RSInterface;
-import org.tribot.api2007.types.RSObject;
-import org.tribot.api2007.types.RSTile;
+import org.tribot.api2007.Skills;
+import org.tribot.api2007.Skills.SKILLS;
+import org.tribot.script.Script;
+import org.tribot.script.ScriptManifest;
+import org.tribot.script.interfaces.Arguments;
+import org.tribot.script.interfaces.Painting;
 
 import scripts.arceuusTabber.data.arceuusInfo;
+import scripts.arceuusTabber.data.arceuusInfo.amountToMake;
+import scripts.arceuusTabber.data.vars;
+import scripts.arceuusTabber.tasks.EnumName;
+import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
+import scripts.arceuusTabber.tasks.HandleEssenceMining;
+import scripts.arceuusTabber.tasks.HandleMakingDarkEssence;
+import scripts.arceuusTabber.tasks.HandleMakingTab;
 import scripts.dax_api.api_lib.DaxWalker;
+import scripts.dax_api.api_lib.models.DaxCredentials;
+import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
 import scripts.framework.Jamie_Task_Framework.Task;
 import scripts.framework.abc.ACamera;
-import scripts.framework.abc.PersistantABCUtil;
-import scripts.tabMaker.framework.Antiban;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class HandleMakingTab extends Task {
-	
-	public RSArea DARK_LECTERN = new RSArea(new RSTile [] { new RSTile(1681, 3765, 0),new RSTile(1677, 3765, 0),new RSTile(1677, 3768, 0),new RSTile(1681, 3768, 0) });
-	public RSArea ARCEUUS_BANK = new RSArea(new RSTile [] { new RSTile(1638, 3753, 0),new RSTile(1633, 3753, 0),new RSTile(1633, 3749, 0),new RSTile(1626, 3750, 0),new RSTile(1626, 3753, 0),new RSTile(1621, 3753, 0),new RSTile(1621, 3736, 0),new RSTile(1638, 3736, 0) });
-	public RSArea ARCEUUS_CITY = new RSArea(new RSTile [] { new RSTile(1626, 3722, 0),new RSTile(1661, 3726, 0),new RSTile(1678, 3722, 0),new RSTile(1694, 3722, 0),new RSTile(1706, 3720, 0),new RSTile(1714, 3729, 0),new RSTile(1716, 3740, 0),new RSTile(1715, 3748, 0),new RSTile(1715, 3762, 0),new RSTile(1712, 3778, 0),new RSTile(1701, 3790, 0),new RSTile(1687, 3789, 0),new RSTile(1668, 3793, 0),new RSTile(1643, 3793, 0),new RSTile(1626, 3777, 0),new RSTile(1607, 3775, 0),new RSTile(1605, 3753, 0) });
+@ScriptManifest(category = "Money Making", name = "FArceuusTabMaker", authors = "flamekiller999")
+public class FinalTabMaker extends Script implements Painting, Arguments {
 
-	public RSObject[] lectern = Objects.findNearest(5, "Lectern");
-	public String[] RUNES = {
-			"Law rune",
-			"Blood rune",
-			"Death rune",
-			"Earth rune",
-			"Water rune",
-			"Mind rune",
-			"Soul rune"
-			
-	};
-	public String[] DARK_ESSENCE = {
-			"Dark essence block"
-	};
-	List<Integer> abc2WaitTimes = new ArrayList<>();
-	private ACamera aCamera = new ACamera(this);
-    private long lastMakingWaitTime;
-    private long averageMakingWaitTime;
-    private long totalMakingWaitTime;
-    private long totalMakingInstances;
+	private static final long startTime = System.currentTimeMillis();
+	private int startLvl = Skills.getActualLevel(SKILLS.MAGIC);
+	private int startTabs = Inventory.getCount(" teleport");
+	private int startXP = Skills.getXP(SKILLS.MAGIC);
+
+    private ArrayList<Task> tasks = new ArrayList<>();
+
+    public static arceuusInfo tabToUse;
+    public amountToMake QUANTITY;
+     
+    public static arceuusInfo tabType;
+    public static int changeAt;
     
-	@Override
-	public String status() {
-		return "Making Tablets" + "Status:" + getTaskState().name();
-	}
+    @Override
+    public void run() {
+    	
+        DaxWalker.setCredentials(new DaxCredentialsProvider() {
+            @Override
+            public DaxCredentials getDaxCredentials() {
+                return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
+            }
+        }
+        );
 
-	@Override
-	public boolean canProcess() {
-		return Banking.find("Dark essence block").length >= 1000; // add customisation to this number so can swap every x amount
-	}
+        addTasks();
 
-	@Override
-	public void process() {
+        while (vars.get().shouldRun){
+            handleTasks();
 
-		switch (getTaskState()) {
-		
-		case WALK_TO_BANK:
-			
-			DaxWalker.walkToBank();
-			while (Player.isMoving()) {
-				
-				Antiban.randomMovement();
-				
-			} General.random(1200, 2400);
-			
-			break;
-		
-		case WITHDRAW_MATERIALS: // need to do this so it takes the 
-			
-			if (Inventory.find(RUNES).length >= 0) { 
-				
-				Banking.openBank();
-				
-				Banking.withdraw(25, DARK_ESSENCE);
-				General.println("You have the required runes, in your inventory");
-				Antiban.randomBankAfk();
-
-			}
-
-			General.sleep(1200, 2500);
-			
-			if (Inventory.find(RUNES).length > 1 && Inventory.find(DARK_ESSENCE).length >= 25) {
-				Banking.close();
-				Antiban.randomBankAfk();
-			}
-			
-			break;
-			
-		case WALK_TO_LECTERN:
-			
-			DaxWalker.walkTo(DARK_LECTERN.getRandomTile());
-			while (Player.isMoving()) {
-				PersistantABCUtil.handleIdleActions();
-			}
-		General.random(1200, 3000);
-		
-		break;
-		
-		case MAKE_TABS:
-			
-			Clicking.click("Study", lectern);
-			while (Player.isMoving()) {
-				abc2WaitTimes.add(Antiban.getReactionTime());
-				Antiban.sleepReactionTime();
-				General.println("ABCv2: Sleeping for generated reaction time");
-			}
-			
-			RSInterface makeTab = Interfaces.get(arceuusInfo.BARROWS.interfaceParent, arceuusInfo.BARROWS.interfaceChild);	//so the Interface here needs to be based off of the arguments and not the BARROWS 
-	
-			if(lectern.length > 0) {
-				Clicking.click(lectern);
-				abc2WaitTimes.add(Antiban.getReactionTime());
-				Antiban.sleepReactionTime();
-				if(makeTab != null) {
-					Clicking.click("Make-All");
-					Antiban.waitItemInteractionDelay(5);
-				}
-			}			
-			break;
-			
-		case IDLE_WHILE_MAKING:
-			
-			 long timeStarted = System.currentTimeMillis();
-	           
-	            while (Player.getAnimation() != -1) { 
-	            	PersistantABCUtil.handleIdleActions();
-	            	if (PersistantABCUtil.handleIdleActions() == true); 
-	            	System.out.println("Performing Idle Actions");
-	            			aCamera.setCameraRotation(25);
-	            			System.out.println("Rotating Camera");
-	            }
-	            PersistantABCUtil.get().generateAndSleep((int) lastMakingWaitTime);
-	            updateStatistics(timeStarted);
-	            break;
-			} 
-	}
-	
-	private enum TaskState {
-		
-		WALK_TO_BANK,
-		WITHDRAW_MATERIALS,
-		WALK_TO_LECTERN,
-		MAKE_TABS,
-		IDLE_WHILE_MAKING
-		
-	}
-	
-	private TaskState getTaskState() {
-		
-		if (Inventory.find(DARK_ESSENCE).length == 0) {
-			return TaskState.WALK_TO_BANK;
-	}
-		if (Banking.isInBank() && Inventory.find(DARK_ESSENCE).length == 0 && ARCEUUS_CITY.contains(Player.getPosition())) {
-			return TaskState.WITHDRAW_MATERIALS;
-	}
-		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1) {
-			return TaskState.WALK_TO_LECTERN;
-	}
-		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1 && DARK_LECTERN.contains(Player.getPosition())) {
-			return TaskState.MAKE_TABS;
-	}
-	return TaskState.IDLE_WHILE_MAKING;
-	
-	}
-	
-    private void updateStatistics(long timeStarted) {
-        lastMakingWaitTime = System.currentTimeMillis() - timeStarted;
-        totalMakingInstances++;
-        totalMakingWaitTime += lastMakingWaitTime;
-        averageMakingWaitTime = totalMakingWaitTime / totalMakingInstances;
+        }
+        General.println("The selected tablet is: " + tabToUse.name());
     }
+
+    private void addTasks() {
+    	
+        tasks.add(new HandleEssenceMining());
+        tasks.add(new HandleDarkEssenceDepositing());
+        tasks.add(new HandleMakingDarkEssence());
+        tasks.add(new HandleMakingTab());
+        
+    }
+
+    private void handleTasks(){
+        for (Task t : tasks){
+            if (t.canProcess()){
+                vars.get().status = t.status();
+                t.process();
+                General.sleep(100, 250);
+                break;
+            }
+        }
+    }
+
+    public static void stopScript(String reason){
+        General.println("Script stopped : " + reason);
+        vars.get().shouldRun = false;
+    }
+
+    @Override
+    public void onPaint(Graphics g) {
+    	
+    	int currentLvl = Skills.getActualLevel(SKILLS.MAGIC);
+    	int gainedLvl = currentLvl - startLvl;
+        long timeRan = System.currentTimeMillis() - startTime;
+        int gainedXP = Skills.getXP(SKILLS.MAGIC) - startXP;
+        int xpToLevel = Skills.getXPToNextLevel(SKILLS.MAGIC);
+        long xpPerHour = (gainedXP * 3600000 / timeRan);
+        int currentTabs = Inventory.getCount(" teleport");
+        int gainedTabs = startTabs - currentTabs;
+        long tabsPerHour = (gainedTabs * 3600000 / timeRan);
+
+        
+
+        g.setColor(Color.WHITE);
+
+        g.drawString("FArceuusTabMaker v0.00", 10, 250);
+        g.drawString("Runtime: " + Timing.msToString(timeRan), 10, 265);
+        g.drawString("Status: " + vars.get().status, 10, 280);
+        g.drawString("Level: " + Skills.getCurrentLevel(Skills.SKILLS.MAGIC) + "(+" + gainedLvl + ")", 10, 295);
+        g.drawString("% to level: " + Skills.getPercentToNextLevel(Skills.SKILLS.MAGIC), 10, 310);
+        g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325); 
+        g.drawString("Tabs Made:" + gainedTabs + "(" + tabsPerHour + ")" ,  10, 340);
+    }
+
+	 @Override
+	 public void passArguments(HashMap<String,  String> hashMap) {
+	    String argumentString = hashMap.get("custom_input"); //user inputted argument check
+        if(argumentString ==  null || argumentString.isEmpty()){ //if that's empty
+            argumentString = hashMap.get("autostart");       //check for auto-started argument instead
+        }
+
+        if(argumentString != null && !argumentString.isEmpty()){ //make sure the argument was entered
+            tabToUse = arceuusInfo.valueOf(argumentString);           //get the Rune object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
+            QUANTITY = amountToMake.valueOf(argumentString);
+        }else{                                                  //argument string is empty
+            General.println("No tabs selected in arguments!");  //let user know missing argument
+        }
+    }
+	    private void argVoid() {
+	        // handle args
+	        if (tabToUse.containsKey() {
+	            tabType = arceuusInfo.valueOf(tabToUse.get(String));
+	        }
+	        
+	        if (QUANTITY.containsKey("changeAt"){
+	            changeAt = Integer.valueOf(QUANTITY.get(int);
+	        }
+	    }
 }
+    
+
