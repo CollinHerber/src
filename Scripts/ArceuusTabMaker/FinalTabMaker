@@ -116,7 +116,7 @@ public class FinalTabMaker extends Script implements Painting, Arguments {
         }
 
         if(argumentString != null && !argumentString.isEmpty()){ //make sure the argument was entered
-            tabToUse = arceuusInfo.valueOf(argumentString);           //get the Rune object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
+            tabToUse = arceuusInfo.valueOf(argumentString);           //get the Tab object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
         }else{                                                  //argument string is empty
             General.println("No tabs selected in arguments!");  //let user know missing argument
         }
