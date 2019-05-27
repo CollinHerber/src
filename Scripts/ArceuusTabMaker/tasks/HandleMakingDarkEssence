@@ -5,32 +5,28 @@ import java.util.List;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Objects;
 import org.tribot.api2007.Player;
-import org.tribot.api2007.Skills;
-import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSArea;
-import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 
 import scripts.dax_api.api_lib.DaxWalker;
-import scripts.framework.Jamie_Task_Framework.Task;
-import scripts.framework.abc.PersistantABCUtil;
-import scripts.tabMaker.framework.Antiban;
+import scripts.arceuusTabber.antiban.Antiban;
+import scripts.arceuusTabber.antiban.PersistantABCUtil;
+import scripts.arceuusTabber.framework.Task;
 
 public class HandleMakingDarkEssence extends Task {
 	
 	public RSArea DARK_ALTAR = new RSArea(new RSTile [] { new RSTile(1711, 3885, 0), new RSTile(1720, 3885, 0), new RSTile(1721, 3879, 0), new RSTile(1711, 3880, 0) });
 	
-	public RSArea AGILITY_LVL67_SHORTCUT_NORTH = new RSArea(new RSTile [] { new RSTile(1763, 3878, 0),new RSTile(1763, 3876, 0),new RSTile(1762, 3876, 0),new RSTile(1761, 3874, 0),new RSTile(1760, 3876, 0),new RSTile(1759, 3876, 0),new RSTile(1759, 3878, 0),new RSTile(1761, 3879, 0) });
-	public RSArea AGILITY_LVL67_SHORTCUT_SOUTH = new RSArea(new RSTile [] { new RSTile(1761, 3872, 0),new RSTile(1761, 3870, 0) });
-	
 	public RSObject[] AGILITY_LVL_67_OBSTICLE = Objects.find(20, 1973);	
 	
 	List<Integer> abc2WaitTimes = new ArrayList<>();
+	public String[] DENSE_ESSENCE = {
+			"Dense essence block"
+	};
 
 
 	@Override
@@ -40,90 +36,47 @@ public class HandleMakingDarkEssence extends Task {
 
 	@Override
 	public boolean canProcess() {
-		return Inventory.getCount("Dense essence block") == 26 || Inventory.isFull();
+		return Inventory.find(DENSE_ESSENCE).length == 26 || Inventory.isFull();
 	}
 
 	@Override
 	public void process() {
 
 		switch (getTaskState()) {
-		
-		case WALK_TO_AGILITY_SHORTCUT:
-			
-			if (Skills.getActualLevel(SKILLS.AGILITY) >= 67) {
-				DaxWalker.walkTo(AGILITY_LVL67_SHORTCUT_SOUTH.getRandomTile());
-				
-				while(Player.isMoving()) {
-					PersistantABCUtil.handleIdleActions();
-				}
-			}
-				else if (Skills.getActualLevel(SKILLS.AGILITY) < 67) {
-					DaxWalker.walkTo(DARK_ALTAR.getRandomTile());
-					System.out.println("Required agility level not met, walking to the Dark Altar."
-							+ "Improving agility will speed this process up.");
-					
-						while(Player.isMoving()) {
-							PersistantABCUtil.handleIdleActions();
-				}
-			}
-			break;
-			
-		case HANDLE_AGILITY_SHORTCUT:
-			
-			if (AGILITY_LVL67_SHORTCUT_SOUTH.contains(Player.getPosition())) {
-				Clicking.click("Climb", AGILITY_LVL_67_OBSTICLE);
-				General.sleep(1400, 2500);
-			}
-			
-			break;
 			
 		case WALK_TO_DARK_ALTAR:
 			
-			if (AGILITY_LVL67_SHORTCUT_NORTH.contains(Player.getPosition())) {
 				DaxWalker.walkTo(DARK_ALTAR.getRandomTile());
 				
 				while(Player.isMoving()) {
 					PersistantABCUtil.handleIdleActions();
-				}
 			}
 			
 			break;
 			
-		case MAKE_DARK_ESSENCE:
+		case MAKE_DARK_ESSENCE: // all you need to do is click "Venerate"
 			
-			RSItem[] denseEssence = Inventory.find("Dense essence block");
 			RSObject[] darkAltar = Objects.findNearest(10, "Dark altar");
 			
-			if (Inventory.find("Dense essence block").length == 0) {
-				Clicking.click("Use", denseEssence[0]);
-				if (Game.getUptext().contains("Use ")) {
-					abc2WaitTimes.add(Antiban.getReactionTime());
-					Antiban.sleepReactionTime();
-					Clicking.click("Use", darkAltar); 
-						General.sleep(250, 600);
-				}
-			}
-	}
+			if (Inventory.find("Dark essence block").length == 0) {
+				Clicking.click("Venerate", darkAltar);
+				abc2WaitTimes.add(Antiban.getReactionTime());
+				Antiban.sleepReactionTime();				
+			} 						General.sleep(250, 600);
+			break;
+
+		}
 
 	}
 	
 	private enum TaskState {
 		
-			WALK_TO_AGILITY_SHORTCUT,
-			HANDLE_AGILITY_SHORTCUT,
 			WALK_TO_DARK_ALTAR,
 			MAKE_DARK_ESSENCE,
 		}
 	private TaskState getTaskState() {
 	
-		if (Inventory.isFull()) {
-			return TaskState.WALK_TO_AGILITY_SHORTCUT;
-		}
-	
-		if (Skills.getActualLevel(SKILLS.AGILITY) >= 67) {
-			return TaskState.HANDLE_AGILITY_SHORTCUT;
-		}
-		if (AGILITY_LVL67_SHORTCUT_NORTH.contains(Player.getPosition())) {
+		if (Inventory.isFull() && Inventory.find("Dense essence block").length >= 26) {
 			return TaskState.WALK_TO_DARK_ALTAR;
 		}
 		return TaskState.MAKE_DARK_ESSENCE;
