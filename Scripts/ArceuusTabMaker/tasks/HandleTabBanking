@@ -1,0 +1,137 @@
+package scripts.arceuusTabber.tasks;
+
+import org.tribot.api.General;
+import org.tribot.api2007.Banking;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.Player;
+import org.tribot.api2007.types.RSArea;
+import org.tribot.api2007.types.RSItem;
+import org.tribot.api2007.types.RSTile;
+
+import scripts.arceuusTabber.FinalTabMaker;
+import scripts.dax_api.api_lib.DaxWalker;
+import scripts.arceuusTabber.antiban.Antiban;
+import scripts.arceuusTabber.framework.Task;
+
+public class HandleTabBanking extends Task {
+
+	public String[] DARK_ESSENCE = { "Dark essence block" };
+	public RSArea ARCEUUS_CITY = new RSArea(new RSTile[] { new RSTile(1626, 3722, 0), new RSTile(1661, 3726, 0),
+			new RSTile(1678, 3722, 0), new RSTile(1694, 3722, 0), new RSTile(1706, 3720, 0), new RSTile(1714, 3729, 0),
+			new RSTile(1716, 3740, 0), new RSTile(1715, 3748, 0), new RSTile(1715, 3762, 0), new RSTile(1712, 3778, 0),
+			new RSTile(1701, 3790, 0), new RSTile(1687, 3789, 0), new RSTile(1668, 3793, 0), new RSTile(1643, 3793, 0),
+			new RSTile(1626, 3777, 0), new RSTile(1607, 3775, 0), new RSTile(1605, 3753, 0) });
+	public RSArea ARCEUUS_BANK = new RSArea(new RSTile[] { new RSTile(1638, 3753, 0), new RSTile(1633, 3753, 0),
+			new RSTile(1633, 3749, 0), new RSTile(1626, 3750, 0), new RSTile(1626, 3753, 0), new RSTile(1621, 3753, 0),
+			new RSTile(1621, 3736, 0), new RSTile(1638, 3736, 0) });
+
+	public String[] RUNES = { "Law rune", "Blood rune", "Death rune", "Earth rune", "Water rune", "Mind rune",
+			"Soul rune" };
+
+	public String[] BARROWS_RUNES = { "Law rune", "Blood rune", "Soul rune" };
+	public String[] MINING_EQUIPMENT = { " pickaxe", "Chisel" };
+
+	public static RSItem[] bankCache = null;
+
+	@Override
+	public String status() {
+		return "Banking" + "Status: " + getTaskState().name();
+	}
+
+	@Override
+	public boolean canProcess() {
+		return Inventory.find(DARK_ESSENCE).length == 0 && ARCEUUS_CITY.contains(Player.getPosition());
+	}
+
+	@Override
+	public void process() {
+
+		switch (getTaskState()) {
+
+		case WALK_TO_BANK:
+
+			DaxWalker.walkTo(ARCEUUS_BANK.getRandomTile());
+			while (Player.isMoving()) {
+
+				Antiban.randomMovement();
+
+			}
+			General.random(400, 1300);
+
+			break;
+
+		case OPEN_BANK:
+
+			Banking.openBank();
+			if (Banking.isBankScreenOpen()) {
+				Antiban.getReactionTime();
+				Antiban.sleepReactionTime();
+			}
+			break;
+
+		case CACHE_BANK:
+
+			bankCache = Banking.getAll();
+			General.println("Generating bank cache...");
+			break;
+
+		case WITHDRAW_MATERIALS:
+
+			if (Inventory.find(MINING_EQUIPMENT).length > 0) {
+				Banking.deposit(1, MINING_EQUIPMENT);
+			}
+
+			// need to check if there are the runes in the bank... will only use for barrows
+			// tabs for now (may add more later when learn how to use args properly)
+			// Barrows runes are: 2 Law rune 1 Blood rune 2 Soul rune
+			if (Inventory.find(BARROWS_RUNES).length >= 0) {
+
+				Banking.withdraw(25000, BARROWS_RUNES);
+
+			} else if (Banking.find(BARROWS_RUNES) == null || Inventory.find(BARROWS_RUNES) == null) {
+				FinalTabMaker.stopScript("Could not find required runes");
+			}
+
+			Banking.withdraw(25, DARK_ESSENCE);
+			General.println("Withdrawing Dark Essence");
+			Antiban.randomBankAfk();
+
+			General.sleep(300, 700);
+
+			break;
+
+		case CLOSE_BANK:
+
+			Banking.close();
+			Antiban.getReactionTime();
+			Antiban.sleepReactionTime();
+
+		}
+	}
+
+	private enum TaskState {
+
+		WALK_TO_BANK, OPEN_BANK, CACHE_BANK, WITHDRAW_MATERIALS, CLOSE_BANK
+
+	}
+
+	private TaskState getTaskState() {
+
+		if (Inventory.find(DARK_ESSENCE).length == 0) {
+			return TaskState.WALK_TO_BANK;
+		}
+		if (Inventory.find(DARK_ESSENCE).length == 0 && Banking.isInBank()) {
+			return TaskState.OPEN_BANK;
+		}
+		if (bankCache == null) {
+			return TaskState.CACHE_BANK;
+		}
+		if (Banking.isBankScreenOpen() && Inventory.find(DARK_ESSENCE).length == 0
+				&& ARCEUUS_CITY.contains(Player.getPosition())) {
+			return TaskState.WITHDRAW_MATERIALS;
+		}
+		return TaskState.CLOSE_BANK;
+
+	}
+
+}
