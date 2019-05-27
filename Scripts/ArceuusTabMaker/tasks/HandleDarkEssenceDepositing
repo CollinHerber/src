@@ -1,32 +1,48 @@
 package scripts.arceuusTabber.tasks;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api2007.Banking;
-import org.tribot.api2007.GameTab;
-import org.tribot.api2007.Interfaces;
+import org.tribot.api2007.Equipment;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.types.RSArea;
-import org.tribot.api2007.types.RSInterfaceChild;
+import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSTile;
 
+import scripts.arceuusTabber.antiban.Antiban;
+import scripts.arceuusTabber.antiban.PersistantABCUtil;
+import scripts.arceuusTabber.framework.Task;
 import scripts.dax_api.api_lib.DaxWalker;
-import scripts.framework.Jamie_Task_Framework.Task;
-import scripts.framework.abc.PersistantABCUtil;
-import scripts.tabMaker.framework.Antiban;
 
-public class HandleDarkEssenceDepositing extends Task{
-	
-	public String[] bank = {
-			"Dark essence block"
-	};
-	
-	public String[] notBank = {
-			" pickaxe",
-			"Chisel"
-	};
-	
-	public RSArea WINTERTODT = new RSArea(null);
+public class HandleDarkEssenceDepositing extends Task {
+
+	public String[] DARK_ESSENCE = { "Dark essence block" };
+
+	public String[] notBank = { " pickaxe", "Chisel" };
+
+	public RSArea WINTERTODT = new RSArea(new RSTile[] { new RSTile(1618, 3931, 0), new RSTile(1617, 3946, 0),
+			new RSTile(1630, 3956, 0), new RSTile(1644, 3948, 0), new RSTile(1642, 3931, 0), new RSTile(1643, 3930, 0),
+			new RSTile(1644, 3930, 0), new RSTile(1627, 3927, 0) });
+
+	public static RSItem[] bankCache = null;
+
+	public String[] PICKAXE = { " pickaxe" };
+	public String[] GAMES_NECKLACE = { "Games necklace(8)", "Games necklace(7)", "Games necklace(6)",
+			"Games necklace(5)", "Games necklace(4)", "Games necklace(3)", "Games necklace(2)", "Games necklace(1)" };
+
+	public RSItem[] GAMES;
+	public RSArea ARCEUUS_CITY = new RSArea(new RSTile[] { new RSTile(1626, 3722, 0), new RSTile(1661, 3726, 0),
+			new RSTile(1678, 3722, 0), new RSTile(1694, 3722, 0), new RSTile(1706, 3720, 0), new RSTile(1714, 3729, 0),
+			new RSTile(1716, 3740, 0), new RSTile(1715, 3748, 0), new RSTile(1715, 3762, 0), new RSTile(1712, 3778, 0),
+			new RSTile(1701, 3790, 0), new RSTile(1687, 3789, 0), new RSTile(1668, 3793, 0), new RSTile(1643, 3793, 0),
+			new RSTile(1626, 3777, 0), new RSTile(1607, 3775, 0), new RSTile(1605, 3753, 0) });
+	// CHANGE THIS TO BE A SMALLER AREA (IDEALLY ARCEUUS BANK)
+
+	List<Integer> abc2WaitTimes = new ArrayList<>();
 
 	@Override
 	public String status() {
@@ -35,92 +51,132 @@ public class HandleDarkEssenceDepositing extends Task{
 
 	@Override
 	public boolean canProcess() {
-		return Inventory.find(bank).length == 26;
+		return Inventory.find(DARK_ESSENCE).length == 26;
 	}
 
 	@Override
 	public void process() {
-		
+
 		switch (getTaskState()) {
-		
+
 		case TELEPORT_TO_WINTERTODT:
-			
-			teleportToWintertodt();
-	
-		break;
-		
-		case WALK_TO_BANK:
-			
-			DaxWalker.walkToBank();
-			
-		break;
-		
-		case DEPOSIT_ITEMS:
-			
-			PersistantABCUtil.getBankPreference();
-			
-			if (!Banking.isBankScreenOpen()) {
-				Banking.openBank();
-			}
-			else if (Banking.isBankScreenOpen() && Banking.isBankLoaded()) {
-				Banking.depositAllExcept(notBank);
-			}	
-			General.random(500, 900);
-	
-		break;
-		
-		case CLOSE_BANK:
-			
-			Banking.close();
-			
+
+			PersistantABCUtil.activateRun();
+			DaxWalker.walkTo(WINTERTODT.getRandomTile());
+
 			break;
-			
+
+		case WALK_TO_BANK:
+
+			PersistantABCUtil.activateRun();
+			DaxWalker.walkToBank();
+
+			break;
+
+		case OPEN_BANK:
+
+			Banking.openBank();
+			if (Banking.isBankScreenOpen()) {
+				abc2WaitTimes.add(Antiban.getReactionTime());
+				Antiban.sleepReactionTime();
+			}
+			break;
+
+		case CACHE_BANK:
+
+			bankCache = Banking.getAll();
+			General.println("Generating bank cache...");
+			break;
+
+		case DEPOSIT_ITEMS:
+
+			if (Banking.isBankScreenOpen() && Banking.isBankLoaded()) {
+				Banking.depositAllExcept(notBank);
+			}
+
+			else if (Banking.find(DARK_ESSENCE).length >= 500) {
+				Banking.depositAll();
+			}
+
+			if (!Equipment.isEquipped(GAMES_NECKLACE)) {
+				Banking.withdraw(1, GAMES_NECKLACE);
+				if (Inventory.find(GAMES_NECKLACE).length == 1) {
+					Banking.close();
+
+					GAMES = Inventory.find(GAMES_NECKLACE);
+
+					Clicking.click("Wear", GAMES);
+				}
+				abc2WaitTimes.add(Antiban.getReactionTime());
+				Antiban.sleepReactionTime();
+			}
+
+			General.random(500, 900);
+
+			break;
+
+		case CLOSE_BANK:
+
+			Banking.close();
+
+			break;
+
 		case AFK_AFTER_BANK:
-			
+
 			Antiban.randomBankAfk();
+
+			break;
+
+		case ENGAGE_NEXT_STAGE:
+
+			DaxWalker.walkTo(ARCEUUS_CITY.getRandomTile());
+			while (Player.isMoving()) {
+				PersistantABCUtil.handleIdleActions();
+			}
+
+			break;
 		}
 	}
 
-	
 	private enum TaskState {
-		TELEPORT_TO_WINTERTODT,
-		WALK_TO_BANK,
-		DEPOSIT_ITEMS,
-		CLOSE_BANK,
-		AFK_AFTER_BANK
+		TELEPORT_TO_WINTERTODT, WALK_TO_BANK, OPEN_BANK, CACHE_BANK, DEPOSIT_ITEMS, CLOSE_BANK, AFK_AFTER_BANK,
+		ENGAGE_NEXT_STAGE
 	}
-	
+
 	private TaskState getTaskState() {
-		
+
 		if (Inventory.isFull()) {
 			return TaskState.TELEPORT_TO_WINTERTODT;
 		}
-		
+
 		if (WINTERTODT.contains(Player.getPosition())) {
 			return TaskState.WALK_TO_BANK;
 		}
-			
-		if (Banking.isInBank())	{
+		if (Inventory.isFull() && Banking.isInBank()) {
+			return TaskState.OPEN_BANK;
+		}
+		if (bankCache == null) {
+			return TaskState.CACHE_BANK;
+		}
+		if (Banking.isInBank()) {
 			return TaskState.DEPOSIT_ITEMS;
 		}
-		
+
 		if (!Inventory.isFull() && Banking.isBankScreenOpen()) {
 			return TaskState.CLOSE_BANK;
 		}
-		
+
+		if (Inventory.find(PICKAXE).length > 0 && Banking.find(DARK_ESSENCE).length >= 500) { // need to add check to
+																								// see if player is
+																								// wearing it eventually
+			General.println("The limit of Dark Essence blocks has been reached."
+					+ "Moving to next stage... Creating Barrows tabs.");
+			return TaskState.ENGAGE_NEXT_STAGE;
+
+		}
+
 		General.println("Successfully deposited items");
 		return TaskState.AFK_AFTER_BANK;
 	}
-	
-	private void teleportToWintertodt() {
-		
-		if (GameTab.open(GameTab.TABS.EQUIPMENT)) {
-			
-			RSInterfaceChild neckSlot = Interfaces.get(387, 8);
-			
-			if (neckSlot != null && neckSlot.click("Wintertodt Camp"));
-			
-		} General.sleep(1200, 1900);
-	} 
-	
+
 }
