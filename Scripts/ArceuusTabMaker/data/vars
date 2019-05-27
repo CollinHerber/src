@@ -1,0 +1,19 @@
+package scripts.arceuusTabber.data;
+
+import java.util.HashMap;
+
+public class vars {
+
+    private vars() {}
+    private static final vars VARS = new vars();
+    public static vars get() { return VARS; }
+    
+	public long runTime;
+
+    public boolean shouldRun = true;
+
+    public String status;
+
+	public HashMap<String, Integer> bankCache = new HashMap<>();
+
+}
