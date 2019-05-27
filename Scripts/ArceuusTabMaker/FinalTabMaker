@@ -7,138 +7,151 @@ import org.tribot.api2007.Skills;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
-import org.tribot.script.interfaces.Arguments;
 import org.tribot.script.interfaces.Painting;
 
 import scripts.arceuusTabber.data.arceuusInfo;
 import scripts.arceuusTabber.data.arceuusInfo.amountToMake;
 import scripts.arceuusTabber.data.vars;
-import scripts.arceuusTabber.tasks.EnumName;
+import scripts.arceuusTabber.framework.Task;
 import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
 import scripts.arceuusTabber.tasks.HandleEssenceMining;
 import scripts.arceuusTabber.tasks.HandleMakingDarkEssence;
 import scripts.arceuusTabber.tasks.HandleMakingTab;
+import scripts.arceuusTabber.tasks.HandleTabBanking;
 import scripts.dax_api.api_lib.DaxWalker;
 import scripts.dax_api.api_lib.models.DaxCredentials;
 import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
-import scripts.framework.Jamie_Task_Framework.Task;
-import scripts.framework.abc.ACamera;
+import scripts.framework.PriceGrabber;
+
+import scripts.framework.abc.Antiban;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @ScriptManifest(category = "Money Making", name = "FArceuusTabMaker", authors = "flamekiller999")
-public class FinalTabMaker extends Script implements Painting, Arguments {
+public class FinalTabMaker extends Script implements Painting {
 
 	private static final long startTime = System.currentTimeMillis();
 	private int startLvl = Skills.getActualLevel(SKILLS.MAGIC);
 	private int startTabs = Inventory.getCount(" teleport");
 	private int startXP = Skills.getXP(SKILLS.MAGIC);
 
-    private ArrayList<Task> tasks = new ArrayList<>();
+	private ArrayList<Task> tasks = new ArrayList<>();
 
-    public static arceuusInfo tabToUse;
-    public amountToMake QUANTITY;
-     
-    public static arceuusInfo tabType;
-    public static int changeAt;
-    
-    @Override
-    public void run() {
-    	
-        DaxWalker.setCredentials(new DaxCredentialsProvider() {
-            @Override
-            public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
-            }
-        }
-        );
+	public static arceuusInfo tabToUse;
+	public amountToMake QUANTITY;
 
-        addTasks();
+	public static arceuusInfo tabType;
+	public static int changeAt;
 
-        while (vars.get().shouldRun){
-            handleTasks();
+	int salePrice = PriceGrabber.getOSbuddyPrice(19629);
+	int runeCost = ((PriceGrabber.getOSbuddyPrice(563)*2) + (PriceGrabber.getOSbuddyPrice(566)*2) + PriceGrabber.getOSbuddyPrice(565));
+	
+	int currentLvl = Skills.getActualLevel(SKILLS.MAGIC);
+	int gainedLvl = currentLvl - startLvl;
+	long timeRan = System.currentTimeMillis() - startTime;
+	int gainedXP = Skills.getXP(SKILLS.MAGIC) - startXP;
+	int xpToLevel = Skills.getXPToNextLevel(SKILLS.MAGIC);
+	long xpPerHour = (gainedXP * 3600000 / timeRan);
+	int currentTabs = Inventory.getCount(" teleport");
+	int gainedTabs = startTabs - currentTabs;
+	long tabsPerHour = (gainedTabs * 3600000 / timeRan);
+	int profitOfTab = salePrice - runeCost;
+	int profitTotal = profitOfTab * gainedTabs;
+	long profitPerHour = (profitTotal * 3600000 / timeRan);
+	
+	@Override
+	public void run() {
+		
+		General.println("Welcome to fArceuus Tabber Beta");
+		General.println("Version:" + "0.00_0");
+		General.println("This script implements ABC2 functions");
 
-        }
-        General.println("The selected tablet is: " + tabToUse.name());
+		DaxWalker.setCredentials(new DaxCredentialsProvider() {
+			@Override
+			public DaxCredentials getDaxCredentials() {
+				return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
+			}
+		});
+		
+		Antiban.create();
+
+		addTasks();
+
+		while (vars.get().shouldRun) {
+			handleTasks();
+		}
+	}
+	
+
+	private void addTasks() {
+
+		tasks.add(new HandleEssenceMining());
+		tasks.add(new HandleMakingDarkEssence());
+		tasks.add(new HandleDarkEssenceDepositing());
+		tasks.add(new HandleMakingTab());
+		tasks.add(new HandleTabBanking());
+
+	}
+
+	private void handleTasks() {
+		for (Task t : tasks) {
+			if (t.canProcess()) {
+				vars.get().status = t.status();
+				t.process();
+				General.sleep(100, 250);
+				break;
+			}
+		}
+	}
+
+	public static void stopScript(String reason) {
+		General.println("Thank you for using fArceuus Tabber");
+		vars.get().shouldRun = false;
+		Antiban.destroy();
+	}
+
+	@Override
+	public void onPaint(Graphics g) {
+
+
+
+		g.setColor(Color.WHITE);
+
+		g.drawString("FArceuusTabMaker v0.00", 10, 250);
+		g.drawString("Runtime: " + Timing.msToString(timeRan), 10, 265);
+		g.drawString(vars.get().status, 10, 280);
+		g.drawString("Level: " + Skills.getCurrentLevel(Skills.SKILLS.MAGIC) + "(+" + gainedLvl + ")", 10, 295);
+		g.drawString("% to level: " + Skills.getPercentToNextLevel(Skills.SKILLS.MAGIC), 10, 310);
+		g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325);
+		g.drawString("Tabs Made: " + gainedTabs + "(" + tabsPerHour + ")", 10, 340);
+		g.drawString("Profit: " + profitTotal + "(" + profitPerHour + ")", 10, 355);
+	}
+
+	 public void passArguments(HashMap <String, String> hashMap) {
+		String argumentString = hashMap.get("custom_input");
+		String argumentString2 = hashMap.get("custom_input");// user inputted argument check
+		String clientStarter = hashMap.get("autostart");
+
+		String input = argumentString != null ? clientStarter : argumentString;
+		String input2 = argumentString2 != null ? clientStarter : argumentString2;
+
+		for (String arg : input.split(";")) {
+
+			if (argumentString == null || argumentString.isEmpty()) { // if that's empty
+				argumentString = hashMap.get("autostart"); // check for auto-started argument instead
+	 		}
+
+			if (argumentString != null && !argumentString.isEmpty()) { // make sure the argument was entered
+			tabToUse = arceuusInfo.valueOf(argumentString); // get the Rune object from enum, choices are													// "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
+			 if (argumentString2 != null && !argumentString2.isEmpty()) {
+				 QUANTITY = amountToMake.valueOf(argumentString);
+			 }
+			} else { // argument string is empty
+				General.println("No tabs selected in arguments!"); // let user know missing argument
+			}
+		}
+
     }
-
-    private void addTasks() {
-    	
-        tasks.add(new HandleEssenceMining());
-        tasks.add(new HandleDarkEssenceDepositing());
-        tasks.add(new HandleMakingDarkEssence());
-        tasks.add(new HandleMakingTab());
-        
-    }
-
-    private void handleTasks(){
-        for (Task t : tasks){
-            if (t.canProcess()){
-                vars.get().status = t.status();
-                t.process();
-                General.sleep(100, 250);
-                break;
-            }
-        }
-    }
-
-    public static void stopScript(String reason){
-        General.println("Script stopped : " + reason);
-        vars.get().shouldRun = false;
-    }
-
-    @Override
-    public void onPaint(Graphics g) {
-    	
-    	int currentLvl = Skills.getActualLevel(SKILLS.MAGIC);
-    	int gainedLvl = currentLvl - startLvl;
-        long timeRan = System.currentTimeMillis() - startTime;
-        int gainedXP = Skills.getXP(SKILLS.MAGIC) - startXP;
-        int xpToLevel = Skills.getXPToNextLevel(SKILLS.MAGIC);
-        long xpPerHour = (gainedXP * 3600000 / timeRan);
-        int currentTabs = Inventory.getCount(" teleport");
-        int gainedTabs = startTabs - currentTabs;
-        long tabsPerHour = (gainedTabs * 3600000 / timeRan);
-
-        
-
-        g.setColor(Color.WHITE);
-
-        g.drawString("FArceuusTabMaker v0.00", 10, 250);
-        g.drawString("Runtime: " + Timing.msToString(timeRan), 10, 265);
-        g.drawString("Status: " + vars.get().status, 10, 280);
-        g.drawString("Level: " + Skills.getCurrentLevel(Skills.SKILLS.MAGIC) + "(+" + gainedLvl + ")", 10, 295);
-        g.drawString("% to level: " + Skills.getPercentToNextLevel(Skills.SKILLS.MAGIC), 10, 310);
-        g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325); 
-        g.drawString("Tabs Made:" + gainedTabs + "(" + tabsPerHour + ")" ,  10, 340);
-    }
-
-	 @Override
-	 public void passArguments(HashMap<String,  String> hashMap) {
-	    String argumentString = hashMap.get("custom_input"); //user inputted argument check
-        if(argumentString ==  null || argumentString.isEmpty()){ //if that's empty
-            argumentString = hashMap.get("autostart");       //check for auto-started argument instead
-        }
-
-        if(argumentString != null && !argumentString.isEmpty()){ //make sure the argument was entered
-            tabToUse = arceuusInfo.valueOf(argumentString);           //get the Tab object from enum, choices are "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
-            QUANTITY = amountToMake.valueOf(argumentString);
-        }else{                                                  //argument string is empty
-            General.println("No tabs selected in arguments!");  //let user know missing argument
-        }
-    }
-	    private void argVoid() {
-	        // handle args
-	        if (tabToUse.containsKey() {
-	            tabType = arceuusInfo.valueOf(tabToUse.get(String));
-	        }
-	        
-	        if (QUANTITY.containsKey("changeAt"){
-	            changeAt = Integer.valueOf(QUANTITY.get(int);
-	        }
-	    }
 }
-    
-
