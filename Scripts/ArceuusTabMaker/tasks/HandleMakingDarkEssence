@@ -20,9 +20,7 @@ import scripts.arceuusTabber.framework.Task;
 public class HandleMakingDarkEssence extends Task {
 	
 	public RSArea DARK_ALTAR = new RSArea(new RSTile [] { new RSTile(1711, 3885, 0), new RSTile(1720, 3885, 0), new RSTile(1721, 3879, 0), new RSTile(1711, 3880, 0) });
-	
-	public RSObject[] AGILITY_LVL_67_OBSTICLE = Objects.find(20, 1973);	
-	
+		
 	List<Integer> abc2WaitTimes = new ArrayList<>();
 	public String[] DENSE_ESSENCE = {
 			"Dense essence block"
