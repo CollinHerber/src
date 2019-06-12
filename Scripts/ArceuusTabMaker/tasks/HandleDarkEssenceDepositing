@@ -15,6 +15,7 @@ import org.tribot.api2007.types.RSTile;
 
 import scripts.arceuusTabber.antiban.Antiban;
 import scripts.arceuusTabber.antiban.PersistantABCUtil;
+import scripts.arceuusTabber.data.vars;
 import scripts.arceuusTabber.framework.Task;
 import scripts.dax_api.api_lib.DaxWalker;
 
@@ -94,7 +95,7 @@ public class HandleDarkEssenceDepositing extends Task {
 				Banking.depositAllExcept(notBank);
 			}
 
-			else if (Banking.find(DARK_ESSENCE).length >= 500) {
+			else if (Banking.find(DARK_ESSENCE).length >= vars.amountOfTabsToMake) {
 				Banking.depositAll();
 			}
 
@@ -111,6 +112,7 @@ public class HandleDarkEssenceDepositing extends Task {
 				Antiban.sleepReactionTime();
 			}
 
+			General.println("Sucessfully deposited items.");
 			General.random(500, 900);
 
 			break;
@@ -166,7 +168,7 @@ public class HandleDarkEssenceDepositing extends Task {
 			return TaskState.CLOSE_BANK;
 		}
 
-		if (Inventory.find(PICKAXE).length > 0 && Banking.find(DARK_ESSENCE).length >= 500) { // need to add check to
+		if (Inventory.find(PICKAXE).length > 0 && Banking.find(DARK_ESSENCE).length >= vars.amountOfTabsToMake) { // need to add check to
 																								// see if player is
 																								// wearing it eventually
 			General.println("The limit of Dark Essence blocks has been reached."
@@ -174,8 +176,6 @@ public class HandleDarkEssenceDepositing extends Task {
 			return TaskState.ENGAGE_NEXT_STAGE;
 
 		}
-
-		General.println("Successfully deposited items");
 		return TaskState.AFK_AFTER_BANK;
 	}
 
