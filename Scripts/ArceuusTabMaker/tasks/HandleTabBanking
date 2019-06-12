@@ -11,6 +11,7 @@ import org.tribot.api2007.types.RSTile;
 import scripts.arceuusTabber.FinalTabMaker;
 import scripts.dax_api.api_lib.DaxWalker;
 import scripts.arceuusTabber.antiban.Antiban;
+import scripts.arceuusTabber.data.vars;
 import scripts.arceuusTabber.framework.Task;
 
 public class HandleTabBanking extends Task {
@@ -25,10 +26,8 @@ public class HandleTabBanking extends Task {
 			new RSTile(1633, 3749, 0), new RSTile(1626, 3750, 0), new RSTile(1626, 3753, 0), new RSTile(1621, 3753, 0),
 			new RSTile(1621, 3736, 0), new RSTile(1638, 3736, 0) });
 
-	public String[] RUNES = { "Law rune", "Blood rune", "Death rune", "Earth rune", "Water rune", "Mind rune",
-			"Soul rune" };
+	public String[] RUNES = { vars.rune1NameString, vars.rune2NameString, vars.rune3NameString };
 
-	public String[] BARROWS_RUNES = { "Law rune", "Blood rune", "Soul rune" };
 	public String[] MINING_EQUIPMENT = { " pickaxe", "Chisel" };
 
 	public static RSItem[] bankCache = null;
@@ -81,14 +80,11 @@ public class HandleTabBanking extends Task {
 				Banking.deposit(1, MINING_EQUIPMENT);
 			}
 
-			// need to check if there are the runes in the bank... will only use for barrows
-			// tabs for now (may add more later when learn how to use args properly)
-			// Barrows runes are: 2 Law rune 1 Blood rune 2 Soul rune
-			if (Inventory.find(BARROWS_RUNES).length >= 0) {
+			if (Inventory.find(RUNES).length >= 0) {
 
-				Banking.withdraw(25000, BARROWS_RUNES);
+				Banking.withdraw(25000, RUNES);
 
-			} else if (Banking.find(BARROWS_RUNES) == null || Inventory.find(BARROWS_RUNES) == null) {
+			} else if (Banking.find(RUNES) == null || Inventory.find(RUNES) == null) {
 				FinalTabMaker.stopScript("Could not find required runes");
 			}
 
