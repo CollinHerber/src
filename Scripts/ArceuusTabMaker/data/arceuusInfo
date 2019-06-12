@@ -37,31 +37,133 @@ public enum arceuusInfo {
 		this.interfaceChild = interfaceChild;
 	}
 
-public enum amountToMake {
-	
-	ONE (100),
-	TWO (200),
-	THREE (300),
-	FOUR (400),
-	FIVE (500),
-	SIX (600),
-	SEVEN (700),
-	EIGHT (800),
-	NINE (900),
-	TEN (1000),
-	ELEVEN (1100),
-	TWELVE (1200),
-	THIRTEEN (1300),
-	FOURTEEN (1400),
-	FIFTEEN (1500);
-	
-	public int amount;
-	
-	amountToMake(int amount) {
-		
-		this.amount = amount;
-		
+	public enum amountToMake {
+
+		ONE(100), TWO(200), THREE(300), FOUR(400), FIVE(500), SIX(600), SEVEN(700), EIGHT(800), NINE(900), TEN(1000),
+		ELEVEN(1100), TWELVE(1200), THIRTEEN(1300), FOURTEEN(1400), FIFTEEN(1500);
+
+		public int amount;
+
+		amountToMake(int amount) {
+
+			this.amount = amount;
+
+		}
+
 	}
-	
-}
+
+	public void convertToInt() {
+		if (vars.tabToMakeString.equals(BARROWS.name())) {
+			vars.rune1 = arceuusInfo.BARROWS.rune1Quantity;
+			vars.rune2 = arceuusInfo.BARROWS.rune2Quantity;
+			vars.rune3 = arceuusInfo.BARROWS.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.BARROWS.runeID1;
+			vars.rune2NameString = arceuusInfo.BARROWS.runeID2;
+			vars.rune3NameString = arceuusInfo.BARROWS.runeID3;
+
+			vars.parent = arceuusInfo.BARROWS.interfaceParent;
+			vars.child = arceuusInfo.BARROWS.interfaceChild;
+		} else if (vars.tabToMakeString.equals(LUMBRIDGE_GRAVEYARD.name())) {
+			vars.rune1 = arceuusInfo.LUMBRIDGE_GRAVEYARD.rune1Quantity;
+			vars.rune2 = arceuusInfo.LUMBRIDGE_GRAVEYARD.rune2Quantity;
+			vars.rune3 = arceuusInfo.LUMBRIDGE_GRAVEYARD.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.LUMBRIDGE_GRAVEYARD.runeID1;
+			vars.rune2NameString = arceuusInfo.LUMBRIDGE_GRAVEYARD.runeID2;
+			vars.rune3NameString = arceuusInfo.LUMBRIDGE_GRAVEYARD.runeID3;
+
+			vars.parent = arceuusInfo.LUMBRIDGE_GRAVEYARD.interfaceParent;
+			vars.child = arceuusInfo.LUMBRIDGE_GRAVEYARD.interfaceChild;
+		} else if (vars.tabToMakeString.equals(DRAYNOR_MANOR.name())) {
+			vars.rune1 = arceuusInfo.DRAYNOR_MANOR.rune1Quantity;
+			vars.rune2 = arceuusInfo.DRAYNOR_MANOR.rune2Quantity;
+			vars.rune3 = arceuusInfo.DRAYNOR_MANOR.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.DRAYNOR_MANOR.runeID1;
+			vars.rune2NameString = arceuusInfo.DRAYNOR_MANOR.runeID2;
+			vars.rune3NameString = arceuusInfo.DRAYNOR_MANOR.runeID3;
+
+			vars.parent = arceuusInfo.DRAYNOR_MANOR.interfaceParent;
+			vars.child = arceuusInfo.DRAYNOR_MANOR.interfaceChild;
+		} else if (vars.tabToMakeString.equals(BATTLEFRONT.name())) {
+			vars.rune1 = arceuusInfo.BATTLEFRONT.rune1Quantity;
+			vars.rune2 = arceuusInfo.BATTLEFRONT.rune2Quantity;
+			vars.rune3 = arceuusInfo.BATTLEFRONT.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.BATTLEFRONT.runeID1;
+			vars.rune2NameString = arceuusInfo.BATTLEFRONT.runeID2;
+			vars.rune3NameString = arceuusInfo.BATTLEFRONT.runeID3;
+
+			vars.parent = arceuusInfo.BATTLEFRONT.interfaceParent;
+			vars.child = arceuusInfo.BATTLEFRONT.interfaceChild;
+		} else if (vars.tabToMakeString.equals(MIND_ALTAR.name())) {
+			vars.rune1 = arceuusInfo.MIND_ALTAR.rune1Quantity;
+			vars.rune2 = arceuusInfo.MIND_ALTAR.rune2Quantity;
+			vars.rune3 = arceuusInfo.MIND_ALTAR.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.MIND_ALTAR.runeID1;
+			vars.rune2NameString = arceuusInfo.MIND_ALTAR.runeID2;
+			vars.rune3NameString = arceuusInfo.MIND_ALTAR.runeID3;
+
+			vars.parent = arceuusInfo.MIND_ALTAR.interfaceParent;
+			vars.child = arceuusInfo.MIND_ALTAR.interfaceChild;
+		} else if (vars.tabToMakeString.equals(SALVE_GRAVEYARD.name())) {
+			vars.rune1 = arceuusInfo.SALVE_GRAVEYARD.rune1Quantity;
+			vars.rune2 = arceuusInfo.SALVE_GRAVEYARD.rune2Quantity;
+			vars.rune3 = arceuusInfo.SALVE_GRAVEYARD.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.SALVE_GRAVEYARD.runeID1;
+			vars.rune2NameString = arceuusInfo.SALVE_GRAVEYARD.runeID2;
+			vars.rune3NameString = arceuusInfo.SALVE_GRAVEYARD.runeID3;
+
+			vars.parent = arceuusInfo.SALVE_GRAVEYARD.interfaceParent;
+			vars.child = arceuusInfo.SALVE_GRAVEYARD.interfaceChild;
+		} else if (vars.tabToMakeString.equals(FENKENSTRAIN_CASTLE.name())) {
+			vars.rune1 = arceuusInfo.FENKENSTRAIN_CASTLE.rune1Quantity;
+			vars.rune2 = arceuusInfo.FENKENSTRAIN_CASTLE.rune2Quantity;
+			vars.rune3 = arceuusInfo.FENKENSTRAIN_CASTLE.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.FENKENSTRAIN_CASTLE.runeID1;
+			vars.rune2NameString = arceuusInfo.FENKENSTRAIN_CASTLE.runeID2;
+			vars.rune3NameString = arceuusInfo.FENKENSTRAIN_CASTLE.runeID3;
+
+			vars.parent = arceuusInfo.FENKENSTRAIN_CASTLE.interfaceParent;
+			vars.child = arceuusInfo.FENKENSTRAIN_CASTLE.interfaceChild;
+		} else if (vars.tabToMakeString.equals(WEST_ARDOUGNE.name())) {
+			vars.rune1 = arceuusInfo.WEST_ARDOUGNE.rune1Quantity;
+			vars.rune2 = arceuusInfo.WEST_ARDOUGNE.rune2Quantity;
+			vars.rune3 = arceuusInfo.WEST_ARDOUGNE.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.WEST_ARDOUGNE.runeID1;
+			vars.rune2NameString = arceuusInfo.WEST_ARDOUGNE.runeID2;
+			vars.rune3NameString = arceuusInfo.WEST_ARDOUGNE.runeID3;
+
+			vars.parent = arceuusInfo.WEST_ARDOUGNE.interfaceParent;
+			vars.child = arceuusInfo.WEST_ARDOUGNE.interfaceChild;
+		} else if (vars.tabToMakeString.equals(HARMONY_ISLAND.name())) {
+			vars.rune1 = arceuusInfo.HARMONY_ISLAND.rune1Quantity;
+			vars.rune2 = arceuusInfo.HARMONY_ISLAND.rune2Quantity;
+			vars.rune3 = arceuusInfo.HARMONY_ISLAND.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.HARMONY_ISLAND.runeID1;
+			vars.rune2NameString = arceuusInfo.HARMONY_ISLAND.runeID2;
+			vars.rune3NameString = arceuusInfo.HARMONY_ISLAND.runeID3;
+
+			vars.parent = arceuusInfo.HARMONY_ISLAND.interfaceParent;
+			vars.child = arceuusInfo.HARMONY_ISLAND.interfaceChild;
+		} else if (vars.tabToMakeString.equals(CEMETRY.name())) {
+			vars.rune1 = arceuusInfo.CEMETRY.rune1Quantity;
+			vars.rune2 = arceuusInfo.CEMETRY.rune2Quantity;
+			vars.rune3 = arceuusInfo.CEMETRY.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.CEMETRY.runeID1;
+			vars.rune2NameString = arceuusInfo.CEMETRY.runeID2;
+			vars.rune3NameString = arceuusInfo.CEMETRY.runeID3;
+
+			vars.parent = arceuusInfo.CEMETRY.interfaceParent;
+			vars.child = arceuusInfo.CEMETRY.interfaceChild;
+		} else if (vars.tabToMakeString.equals(APE_ATOLL.name())) {
+			vars.rune1 = arceuusInfo.APE_ATOLL.rune1Quantity;
+			vars.rune2 = arceuusInfo.APE_ATOLL.rune2Quantity;
+			vars.rune3 = arceuusInfo.APE_ATOLL.rune3Quantity;
+			vars.rune1NameString = arceuusInfo.APE_ATOLL.runeID1;
+			vars.rune2NameString = arceuusInfo.APE_ATOLL.runeID2;
+			vars.rune3NameString = arceuusInfo.APE_ATOLL.runeID3;
+
+			vars.parent = arceuusInfo.APE_ATOLL.interfaceParent;
+			vars.child = arceuusInfo.APE_ATOLL.interfaceChild;
+		}
+	}
+
 }
