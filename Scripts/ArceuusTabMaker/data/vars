@@ -2,11 +2,27 @@ package scripts.arceuusTabber.data;
 
 import java.util.HashMap;
 
+
 public class vars {
 
     private vars() {}
     private static final vars VARS = new vars();
     public static vars get() { return VARS; }
+    
+    public static String tabToMakeString = "";
+    public static int amountOfTabsToMake = 0;
+    public static int rune1 = 0;
+    public static int rune2 = 0;
+    public static int rune3 = 0;
+    public static String rune1NameString = "";
+    public static String rune2NameString = "";
+    public static String rune3NameString = "";
+    
+    public static int parent = 0;
+    public static int child = 0;
+    
+    public static int speedMin = 0;
+    public static int speedMax = 0;
     
 	public long runTime;
 
@@ -15,5 +31,6 @@ public class vars {
     public String status;
 
 	public HashMap<String, Integer> bankCache = new HashMap<>();
+
 
 }
