@@ -2,6 +2,7 @@ package scripts.arceuusTabber;
 
 import org.tribot.api.General;
 import org.tribot.api.Timing;
+import org.tribot.api.input.Mouse;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.Skills.SKILLS;
@@ -9,25 +10,25 @@ import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 
+import scripts.GUI.GUI;
+import scripts.arceuusTabber.antiban.Antiban;
+import scripts.arceuusTabber.antiban.PersistantABCUtil;
 import scripts.arceuusTabber.data.arceuusInfo;
-import scripts.arceuusTabber.data.arceuusInfo.amountToMake;
 import scripts.arceuusTabber.data.vars;
 import scripts.arceuusTabber.framework.Task;
+import scripts.arceuusTabber.framework.PriceGrabber;
 import scripts.arceuusTabber.tasks.HandleDarkEssenceDepositing;
 import scripts.arceuusTabber.tasks.HandleEssenceMining;
 import scripts.arceuusTabber.tasks.HandleMakingDarkEssence;
 import scripts.arceuusTabber.tasks.HandleMakingTab;
 import scripts.arceuusTabber.tasks.HandleTabBanking;
+
 import scripts.dax_api.api_lib.DaxWalker;
 import scripts.dax_api.api_lib.models.DaxCredentials;
 import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
-import scripts.framework.PriceGrabber;
-
-import scripts.framework.abc.Antiban;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @ScriptManifest(category = "Money Making", name = "FArceuusTabMaker", authors = "flamekiller999")
 public class FinalTabMaker extends Script implements Painting {
@@ -39,15 +40,6 @@ public class FinalTabMaker extends Script implements Painting {
 
 	private ArrayList<Task> tasks = new ArrayList<>();
 
-	public static arceuusInfo tabToUse;
-	public amountToMake QUANTITY;
-
-	public static arceuusInfo tabType;
-	public static int changeAt;
-
-	int salePrice = PriceGrabber.getOSbuddyPrice(19629);
-	int runeCost = ((PriceGrabber.getOSbuddyPrice(563)*2) + (PriceGrabber.getOSbuddyPrice(566)*2) + PriceGrabber.getOSbuddyPrice(565));
-	
 	int currentLvl = Skills.getActualLevel(SKILLS.MAGIC);
 	int gainedLvl = currentLvl - startLvl;
 	long timeRan = System.currentTimeMillis() - startTime;
@@ -57,16 +49,16 @@ public class FinalTabMaker extends Script implements Painting {
 	int currentTabs = Inventory.getCount(" teleport");
 	int gainedTabs = startTabs - currentTabs;
 	long tabsPerHour = (gainedTabs * 3600000 / timeRan);
-	int profitOfTab = salePrice - runeCost;
-	int profitTotal = profitOfTab * gainedTabs;
-	long profitPerHour = (profitTotal * 3600000 / timeRan);
-	
+
+
+	public boolean GUI_COMPLETE = false;
+	public int amountToCreate = 0;
+	public int speed = General.random(vars.speedMin, vars.speedMax);
+
 	@Override
 	public void run() {
-		
-		General.println("Welcome to fArceuus Tabber Beta");
-		General.println("Version:" + "0.00_0");
-		General.println("This script implements ABC2 functions");
+
+		GUI GUI = new GUI();
 
 		DaxWalker.setCredentials(new DaxCredentialsProvider() {
 			@Override
@@ -74,16 +66,43 @@ public class FinalTabMaker extends Script implements Painting {
 				return new DaxCredentials("sub_DPjcfqN4YkIxm8", "PUBLIC-KEY");
 			}
 		});
-		
-		Antiban.create();
 
+		Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
+		int screenW = (screensize.width) / 2;
+		int screenH = (screensize.height) / 2;
+
+		Dimension dim = GUI.getSize();
+
+		GUI.setVisible(true);
+
+		GUI.setLocation((screenW / 2), (screenH / 2));
+
+		while (!GUI_COMPLETE) {
+			sleep(300);
+		}
+
+		Mouse.setSpeed(speed);
+		
 		addTasks();
 
-		while (vars.get().shouldRun) {
+		while (vars.get().shouldRun) {			
 			handleTasks();
 		}
+
+		General.println("Welcome to fArceuus Tabber Beta");
+		General.println("Version:" + "0.00_0");
+		General.println("This script implements ABC2 functions");
+		General.println("We are making:" + vars.tabToMakeString);
+		General.println("We are swapping at" + vars.amountOfTabsToMake + "Dark essence");
+
+
+		GUI.setVisible(false);
+		while (true) {
+			sleep(5000);
+			stopScript();
+		}
+
 	}
-	
 
 	private void addTasks() {
 
@@ -109,13 +128,10 @@ public class FinalTabMaker extends Script implements Painting {
 	public static void stopScript(String reason) {
 		General.println("Thank you for using fArceuus Tabber");
 		vars.get().shouldRun = false;
-		Antiban.destroy();
 	}
 
 	@Override
 	public void onPaint(Graphics g) {
-
-
 
 		g.setColor(Color.WHITE);
 
@@ -126,32 +142,242 @@ public class FinalTabMaker extends Script implements Painting {
 		g.drawString("% to level: " + Skills.getPercentToNextLevel(Skills.SKILLS.MAGIC), 10, 310);
 		g.drawString("XP to level: " + xpToLevel + "(" + xpPerHour + ")", 10, 325);
 		g.drawString("Tabs Made: " + gainedTabs + "(" + tabsPerHour + ")", 10, 340);
-		g.drawString("Profit: " + profitTotal + "(" + profitPerHour + ")", 10, 355);
 	}
 
-	 public void passArguments(HashMap <String, String> hashMap) {
-		String argumentString = hashMap.get("custom_input");
-		String argumentString2 = hashMap.get("custom_input");// user inputted argument check
-		String clientStarter = hashMap.get("autostart");
+	public class GUI extends javax.swing.JFrame {
 
-		String input = argumentString != null ? clientStarter : argumentString;
-		String input2 = argumentString2 != null ? clientStarter : argumentString2;
-
-		for (String arg : input.split(";")) {
-
-			if (argumentString == null || argumentString.isEmpty()) { // if that's empty
-				argumentString = hashMap.get("autostart"); // check for auto-started argument instead
-	 		}
-
-			if (argumentString != null && !argumentString.isEmpty()) { // make sure the argument was entered
-			tabToUse = arceuusInfo.valueOf(argumentString); // get the Rune object from enum, choices are													// "LUMBRIDGE_GRAVEYARD", "DRAYNOR_MANOR" etc...
-			 if (argumentString2 != null && !argumentString2.isEmpty()) {
-				 QUANTITY = amountToMake.valueOf(argumentString);
-			 }
-			} else { // argument string is empty
-				General.println("No tabs selected in arguments!"); // let user know missing argument
-			}
+		/**
+		 * Creates new form GUI
+		 */
+		public GUI() {
+			initComponents();
 		}
 
-    }
+		/**
+		 * This method is called from within the constructor to initialize the form.
+		 * WARNING: Do NOT modify this code. The content of this method is always
+		 * regenerated by the Form Editor.
+		 */
+		@SuppressWarnings("unchecked")
+		// <editor-fold defaultstate="collapsed" desc="Generated Code">
+		private void initComponents() {
+
+			jLabel1 = new javax.swing.JLabel();
+			ComboOne = new javax.swing.JComboBox<>();
+			txtComboBoxItem = new javax.swing.JTextField();
+			btnComboBox = new javax.swing.JButton();
+			jLabel2 = new javax.swing.JLabel();
+			essMine = new javax.swing.JSpinner();
+			jLabel3 = new javax.swing.JLabel();
+			StartBtn = new javax.swing.JButton();
+			jLabel4 = new javax.swing.JLabel();
+			MinMouseSpeed = new javax.swing.JTextField();
+			jLabel5 = new javax.swing.JLabel();
+			jLabel6 = new javax.swing.JLabel();
+			MaxMouseSpeed = new javax.swing.JTextField();
+
+			jLabel1.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 24)); // NOI18N
+			jLabel1.setText("Arceuus Tab Maker");
+			jLabel1.setToolTipText("");
+
+			ComboOne.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 14)); // NOI18N
+			ComboOne.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "BARROWS", "LUMBRIDGE_GRAVEYARD",
+					"DRAYNOR_MANOR", "BATTLEFRONT", "MIND_ALTAR", "SALVE_GRAVEYARD", "FENKENSTRAIN_CASTLE",
+					"WEST_ARDOUGNE", "HARMONY_ISLAND", "CEMETRY", "APE_ATOLL" }));
+
+			txtComboBoxItem.setEditable(false);
+			txtComboBoxItem.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 14)); // NOI18N
+			txtComboBoxItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					txtComboBoxItemActionPerformed(evt);
+				}
+			});
+
+			btnComboBox.setBackground(new java.awt.Color(255, 255, 255));
+			btnComboBox.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 13)); // NOI18N
+			btnComboBox.setText("Get Drop Down Item");
+			btnComboBox.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					btnComboBoxActionPerformed(evt);
+				}
+			});
+
+			jLabel2.setText("by flamekiller999");
+
+			essMine.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 14)); // NOI18N
+			essMine.setModel(new javax.swing.SpinnerNumberModel(500, 100, 1000, 1));
+
+			jLabel3.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 14)); // NOI18N
+			jLabel3.setText("Essence to Mine:");
+
+			StartBtn.setFont(new java.awt.Font("Gurmukhi Sangam MN", 0, 24)); // NOI18N
+			StartBtn.setText("START");
+			StartBtn.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					StartBtnActionPerformed(evt);
+				}
+			});
+
+			jLabel4.setText("Mouse Speed:");
+
+			MinMouseSpeed.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					MinMouseSpeedActionPerformed(evt);
+				}
+			});
+
+			jLabel5.setText("Min");
+
+			jLabel6.setText("Max");
+
+			MaxMouseSpeed.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					MaxMouseSpeedActionPerformed(evt);
+				}
+			});
+
+			javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+			getContentPane().setLayout(layout);
+			layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(ComboOne, javax.swing.GroupLayout.PREFERRED_SIZE,
+									javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+									.addComponent(jLabel1)
+									.addGroup(layout.createSequentialGroup().addGroup(layout
+											.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+											.addGroup(layout.createSequentialGroup().addGap(6, 6, 6)
+													.addComponent(jLabel3)
+													.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+															javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+													.addComponent(essMine, javax.swing.GroupLayout.PREFERRED_SIZE, 72,
+															javax.swing.GroupLayout.PREFERRED_SIZE))
+											.addComponent(btnComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 169,
+													javax.swing.GroupLayout.PREFERRED_SIZE))
+											.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+											.addComponent(txtComboBoxItem, javax.swing.GroupLayout.PREFERRED_SIZE, 207,
+													javax.swing.GroupLayout.PREFERRED_SIZE)))
+							.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+							.addGap(0, 0, Short.MAX_VALUE)
+							.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+									.addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+											layout.createSequentialGroup().addComponent(jLabel2).addGap(247, 247, 247))
+									.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+											.addComponent(jLabel4).addGap(7, 7, 7).addComponent(jLabel6)
+											.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+											.addComponent(MaxMouseSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+													javax.swing.GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+											.addComponent(jLabel5)
+											.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+											.addComponent(MinMouseSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+													javax.swing.GroupLayout.PREFERRED_SIZE)
+											.addGap(181, 181, 181))
+									.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+											.addComponent(StartBtn).addGap(247, 247, 247)))));
+			layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+					.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+							.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(jLabel1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(jLabel2).addGap(8, 8, 8)
+							.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+									.addComponent(ComboOne, javax.swing.GroupLayout.PREFERRED_SIZE, 30,
+											javax.swing.GroupLayout.PREFERRED_SIZE)
+									.addComponent(btnComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+											javax.swing.GroupLayout.PREFERRED_SIZE)
+									.addComponent(txtComboBoxItem, javax.swing.GroupLayout.PREFERRED_SIZE, 31,
+											javax.swing.GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+									.addComponent(jLabel3).addComponent(essMine, javax.swing.GroupLayout.PREFERRED_SIZE,
+											javax.swing.GroupLayout.DEFAULT_SIZE,
+											javax.swing.GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+									.addComponent(jLabel4)
+									.addComponent(MinMouseSpeed, javax.swing.GroupLayout.PREFERRED_SIZE,
+											javax.swing.GroupLayout.DEFAULT_SIZE,
+											javax.swing.GroupLayout.PREFERRED_SIZE)
+									.addComponent(jLabel5).addComponent(jLabel6).addComponent(MaxMouseSpeed,
+											javax.swing.GroupLayout.PREFERRED_SIZE,
+											javax.swing.GroupLayout.DEFAULT_SIZE,
+											javax.swing.GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(StartBtn)
+							.addContainerGap()));
+
+			pack();
+		}// </editor-fold>
+
+		private void txtComboBoxItemActionPerformed(java.awt.event.ActionEvent evt) {
+
+			// TODO add your handling code here:
+		}
+
+		private void btnComboBoxActionPerformed(java.awt.event.ActionEvent evt) {
+			String itemText = (String) ComboOne.getSelectedItem();
+			txtComboBoxItem.setText(itemText); // TODO add your handling code here:
+		}
+
+		private void StartBtnActionPerformed(java.awt.event.ActionEvent evt) {
+			if (this.txtComboBoxItem.getText().equals(arceuusInfo.BARROWS.name())) {
+				vars.tabToMakeString = arceuusInfo.BARROWS.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.LUMBRIDGE_GRAVEYARD.name())) {
+				vars.tabToMakeString = arceuusInfo.LUMBRIDGE_GRAVEYARD.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.DRAYNOR_MANOR.name())) {
+				vars.tabToMakeString = arceuusInfo.DRAYNOR_MANOR.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.BATTLEFRONT.name())) {
+				vars.tabToMakeString = arceuusInfo.BATTLEFRONT.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.MIND_ALTAR.name())) {
+				vars.tabToMakeString = arceuusInfo.MIND_ALTAR.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.SALVE_GRAVEYARD.name())) {
+				vars.tabToMakeString = arceuusInfo.SALVE_GRAVEYARD.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.FENKENSTRAIN_CASTLE.name())) {
+				vars.tabToMakeString = arceuusInfo.FENKENSTRAIN_CASTLE.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.WEST_ARDOUGNE.name())) {
+				vars.tabToMakeString = arceuusInfo.WEST_ARDOUGNE.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.HARMONY_ISLAND.name())) {
+				vars.tabToMakeString = arceuusInfo.HARMONY_ISLAND.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.CEMETRY.name())) {
+				vars.tabToMakeString = arceuusInfo.CEMETRY.name();
+			} else if (this.txtComboBoxItem.getText().equals(arceuusInfo.APE_ATOLL.name())) {
+				vars.tabToMakeString = arceuusInfo.APE_ATOLL.name();
+			}
+
+			vars.amountOfTabsToMake = Integer.parseInt(essMine.getValue().toString());
+			vars.speedMax = Integer.parseInt(MaxMouseSpeed.getText().toString());
+			vars.speedMin = Integer.parseInt(MinMouseSpeed.getText().toString());
+
+			GUI_COMPLETE = true;
+		}
+
+		private void MinMouseSpeedActionPerformed(java.awt.event.ActionEvent evt) {
+			// TODO add your handling code here:
+		}
+
+		private void MaxMouseSpeedActionPerformed(java.awt.event.ActionEvent evt) {
+			// TODO add your handling code here:
+		}
+
+		/**
+		 * @param args the command line arguments
+		 */
+
+		// Variables declaration - do not modify
+		private javax.swing.JComboBox<String> ComboOne;
+		private javax.swing.JTextField MaxMouseSpeed;
+		private javax.swing.JTextField MinMouseSpeed;
+		private javax.swing.JButton StartBtn;
+		private javax.swing.JButton btnComboBox;
+		private javax.swing.JSpinner essMine;
+		private javax.swing.JLabel jLabel1;
+		private javax.swing.JLabel jLabel2;
+		private javax.swing.JLabel jLabel3;
+		private javax.swing.JLabel jLabel4;
+		private javax.swing.JLabel jLabel5;
+		private javax.swing.JLabel jLabel6;
+		private javax.swing.JTextField txtComboBoxItem;
+		// End of variables declaration
+	}
 }
