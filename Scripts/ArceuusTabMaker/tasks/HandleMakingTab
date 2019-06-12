@@ -6,6 +6,7 @@ import java.util.List;
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api2007.Banking;
+import org.tribot.api2007.Camera;
 import org.tribot.api2007.Interfaces;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Objects;
@@ -15,47 +16,36 @@ import org.tribot.api2007.types.RSInterface;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 
-import scripts.arceuusTabber.data.arceuusInfo;
+import scripts.arceuusTabber.data.vars;
 import scripts.dax_api.api_lib.DaxWalker;
-import scripts.framework.abc.ACamera;
-import scripts.arceuusTabber.FinalTabMaker;
 import scripts.arceuusTabber.antiban.Antiban;
 import scripts.arceuusTabber.antiban.PersistantABCUtil;
 import scripts.arceuusTabber.framework.Task;
 
-
 public class HandleMakingTab extends Task {
-	
-	public RSArea DARK_LECTERN = new RSArea(new RSTile [] { new RSTile(1681, 3765, 0),new RSTile(1677, 3765, 0),new RSTile(1677, 3768, 0),new RSTile(1681, 3768, 0) });
-	public RSArea ARCEUUS_CITY = new RSArea(new RSTile [] { new RSTile(1626, 3722, 0),new RSTile(1661, 3726, 0),new RSTile(1678, 3722, 0),new RSTile(1694, 3722, 0),new RSTile(1706, 3720, 0),new RSTile(1714, 3729, 0),new RSTile(1716, 3740, 0),new RSTile(1715, 3748, 0),new RSTile(1715, 3762, 0),new RSTile(1712, 3778, 0),new RSTile(1701, 3790, 0),new RSTile(1687, 3789, 0),new RSTile(1668, 3793, 0),new RSTile(1643, 3793, 0),new RSTile(1626, 3777, 0),new RSTile(1607, 3775, 0),new RSTile(1605, 3753, 0) });
+
+	public RSArea DARK_LECTERN = new RSArea(new RSTile[] { new RSTile(1681, 3765, 0), new RSTile(1677, 3765, 0),
+			new RSTile(1677, 3768, 0), new RSTile(1681, 3768, 0) });
+	public RSArea ARCEUUS_CITY = new RSArea(new RSTile[] { new RSTile(1626, 3722, 0), new RSTile(1661, 3726, 0),
+			new RSTile(1678, 3722, 0), new RSTile(1694, 3722, 0), new RSTile(1706, 3720, 0), new RSTile(1714, 3729, 0),
+			new RSTile(1716, 3740, 0), new RSTile(1715, 3748, 0), new RSTile(1715, 3762, 0), new RSTile(1712, 3778, 0),
+			new RSTile(1701, 3790, 0), new RSTile(1687, 3789, 0), new RSTile(1668, 3793, 0), new RSTile(1643, 3793, 0),
+			new RSTile(1626, 3777, 0), new RSTile(1607, 3775, 0), new RSTile(1605, 3753, 0) });
 
 	public RSObject[] lectern = Objects.findNearest(5, "Lectern");
-	public String[] RUNES = {
-			"Law rune",
-			"Blood rune",
-			"Death rune",
-			"Earth rune",
-			"Water rune",
-			"Mind rune",
-			"Soul rune"
-			
-	};
-	public String[] DARK_ESSENCE = {
-			"Dark essence block"
-	};
-	List<Integer> abc2WaitTimes = new ArrayList<>();
-	private ACamera aCamera = new ACamera(this);
-    private long lastMakingWaitTime;
-    private long averageMakingWaitTime;
-    private long totalMakingWaitTime;
-    private long totalMakingInstances;
-    
-	public String[] PICKAXE = { " pickaxe" };
-	public String[] MINING_EQUIPMENT = {
-			" pickaxe",
-			"Chisel"
-	};
+	public String[] RUNES = { vars.rune1NameString, vars.rune2NameString, vars.rune3NameString };
 
+	public String[] DARK_ESSENCE = { "Dark essence block" };
+	public String[] DENSE_ESSENCE = { "Dense essence block" };
+	List<Integer> abc2WaitTimes = new ArrayList<>();
+		
+	private long lastMakingWaitTime;
+	private long averageMakingWaitTime;
+	private long totalMakingWaitTime;
+	private long totalMakingInstances;
+
+	public String[] PICKAXE = { " pickaxe" };
+	public String[] MINING_EQUIPMENT = { " pickaxe", "Chisel" };
 
 	@Override
 	public String status() {
@@ -64,114 +54,124 @@ public class HandleMakingTab extends Task {
 
 	@Override
 	public boolean canProcess() {
-		return (HandleTabBanking.bankCache.equals(DARK_ESSENCE) || HandleDarkEssenceDepositing.bankCache.equals(DARK_ESSENCE))
-				&& (!(Inventory.find(PICKAXE).length < 1)) && DARK_ESSENCE.length >= FinalTabMaker.changeAt; //|| (!Equipment.getItem(SLOTS.WEAPON).equals(PICKAXE))); // add customisation to this number so can swap every x amount
+		return ((Banking.find(DARK_ESSENCE).length >= vars.amountOfTabsToMake) && (!(Inventory.find(PICKAXE).length < 1))
+				&& ARCEUUS_CITY.contains(Player.getPosition())); // ||
+																	// (!Equipment.getItem(SLOTS.WEAPON).equals(PICKAXE)));
+																	// // add customisation to this number so can swap
+																	// every x amount
 	}
+
+	// THOUGHT... FOR THE TYPE OF RUNE NEEDED USE ARCEUUSINFO AND USE GUI STRING TO
+	// SELECT THE TAB. THEN USE THIS TO SELECT THE RUNES AND * BUT THE ASSOCIATED
+	// INT
+	// e.g. Banking.withdraw((arceuusInfo.BARROWS.runeID1 *
+	// arceuusInfo.BARROWS.rune1Quantity * (GUI_DARK_ESSENCE_TO_MINE));
+	// would need to add a new banking function for this though
 
 	@Override
 	public void process() {
 
 		switch (getTaskState()) {
-		
-		
+
 		case RETURN_TO_MINING:
-			
+
 			DaxWalker.walkToBank();
 			Banking.depositAll();
 			Banking.withdraw(1, MINING_EQUIPMENT);
 			Antiban.randomBankAfk();
-			
+
 			if (Inventory.find(MINING_EQUIPMENT).length >= 1) {
 				Banking.close();
-			} General.sleep(900, 1400);
-			
+			}
+			General.sleep(900, 1400);
+
 			break;
-			
+
 		case WALK_TO_LECTERN:
-			
+
 			DaxWalker.walkTo(DARK_LECTERN.getRandomTile());
 			while (Player.isMoving()) {
 				PersistantABCUtil.handleIdleActions();
 			}
-		General.random(1200, 3000);
-		
-		break;
-		
+			General.random(1200, 3000);
+
+			break;
+
 		case MAKE_TABS:
-			
+
 			Clicking.click("Study", lectern);
 			while (Player.isMoving()) {
 				abc2WaitTimes.add(Antiban.getReactionTime());
 				Antiban.sleepReactionTime();
 				General.println("ABCv2: Sleeping for generated reaction time");
 			}
-			
-			RSInterface makeTab = Interfaces.get(arceuusInfo.BARROWS.interfaceParent, arceuusInfo.BARROWS.interfaceChild);	//so the Interface here needs to be based off of the arguments and not the BARROWS 
-	
-			if(lectern.length > 0) {
+
+			RSInterface makeTab = Interfaces.get(vars.parent, vars.child); // so the Interface here needs to be based
+																			// off of the arguments
+																			// and not the BARROWS
+
+			if (lectern.length > 0) {
 				Clicking.click(lectern);
 				abc2WaitTimes.add(Antiban.getReactionTime());
 				Antiban.sleepReactionTime();
-				if(makeTab != null) {
+				if (makeTab != null) {
 					Clicking.click("Make-All");
 					Antiban.waitItemInteractionDelay(5);
 
 				}
-			}			
+			}
 			break;
-			
+
 		case IDLE_WHILE_MAKING:
-			
-			 long timeStarted = System.currentTimeMillis();
-	           
-	            while (Player.getAnimation() != -1) { 
-	            	PersistantABCUtil.handleIdleActions();
-	            	if (PersistantABCUtil.handleIdleActions() == true); 
-	            	System.out.println("Performing Idle Actions");
-	            			aCamera.setCameraRotation(25);
-	            			System.out.println("Rotating Camera");
-	            }
-	            PersistantABCUtil.get().generateAndSleep((int) averageMakingWaitTime);
-	            updateStatistics(timeStarted);
-	            
-	            Antiban.leaveGame();
-	            Antiban.randomMovement();
-	            
-	            break;
-			} 
+
+			long timeStarted = System.currentTimeMillis();
+
+			while (Player.getAnimation() != -1) {
+				PersistantABCUtil.handleIdleActions();
+				if (PersistantABCUtil.handleIdleActions() == true)
+					;
+				System.out.println("Performing Idle Actions");
+				Camera.setCameraRotation(25);
+				System.out.println("Rotating Camera");
+			}
+			PersistantABCUtil.get().generateAndSleep((int) averageMakingWaitTime);
+			updateStatistics(timeStarted);
+
+			Antiban.leaveGame();
+			Antiban.randomMovement();
+
+			break;
+		}
 	}
-	
+
 	private enum TaskState {
-		
-		RETURN_TO_MINING,
-		WALK_TO_LECTERN,
-		MAKE_TABS,
-		IDLE_WHILE_MAKING
-		
+
+		RETURN_TO_MINING, WALK_TO_LECTERN, MAKE_TABS, IDLE_WHILE_MAKING
+
 	}
-	
+
 	private TaskState getTaskState() {
-		
-		
+
 		if (!(Banking.find(DARK_ESSENCE).length == 0) && (!(Inventory.find(DARK_ESSENCE).length == 0))) {
 			return TaskState.RETURN_TO_MINING;
 		}
 
 		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1) {
 			return TaskState.WALK_TO_LECTERN;
-	}
-		
-		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1 && DARK_LECTERN.contains(Player.getPosition())) {
+		}
+
+		if (Inventory.find(DARK_ESSENCE).length >= 1 && Inventory.find(RUNES).length >= 1
+				&& DARK_LECTERN.contains(Player.getPosition())) {
 			return TaskState.MAKE_TABS;
+		}
+		return TaskState.IDLE_WHILE_MAKING;
+
 	}
-	return TaskState.IDLE_WHILE_MAKING;
-	
+
+	private void updateStatistics(long timeStarted) {
+		lastMakingWaitTime = System.currentTimeMillis() - timeStarted;
+		totalMakingInstances++;
+		totalMakingWaitTime += lastMakingWaitTime;
+		averageMakingWaitTime = totalMakingWaitTime / totalMakingInstances;
 	}
-	
-    private void updateStatistics(long timeStarted) {
-        lastMakingWaitTime = System.currentTimeMillis() - timeStarted;
-        totalMakingInstances++;
-        totalMakingWaitTime += lastMakingWaitTime;
-        averageMakingWaitTime = totalMakingWaitTime / totalMakingInstances;
-    }
 }
