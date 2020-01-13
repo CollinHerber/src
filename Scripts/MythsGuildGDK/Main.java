@@ -42,7 +42,7 @@ public class Main extends Script implements Painting{
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
             public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("sub_DPjXXzL5DeSiPf", "PUBLIC-KEY");
+                return new DaxCredentials("PRIVATE-KEY", "PUBLIC-KEY");
             }
         });
 
