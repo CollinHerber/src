@@ -1,7 +1,5 @@
 package scripts.MythsGuildGDK.Antiban;
 
-
-
 import org.tribot.api.Clicking;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
@@ -26,11 +24,6 @@ public class PersistantABCUtil extends ABCUtil {
     private int resourcesLost = 0;
     private long resourceSwitchCheckTime = Timing.currentTimeMillis() + General.random(20000, 30000);
     public long lastCombatTime = 0;
-
-    private long lastWoodcuttingWaitTime;
-    private long averageWoodcuttingWaitTime;
-    private long totalWoodcuttingWaitTime;
-    private long totalWoodcuttingInstances;
 
     private static Positionable nextTarget;
     private static Positionable nextTargetClosest;
