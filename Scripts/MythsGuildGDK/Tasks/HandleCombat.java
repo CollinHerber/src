@@ -55,7 +55,7 @@ public class HandleCombat implements Task {
                         General.sleep(General.randomSD(325, 45));
                     }
                     if (!dragon.isInCombat()) { //can add here the death animation check
-                        if (DynamicClicking.clickRSNPC(dragon, "Attack")) { // following code is new addition to sleep if successfully clicked attack
+                        if (DynamicClicking.clickRSNPC(dragon, "Attack")) { 
                             System.out.println("Attacking dragon...");
                             Timing.waitCondition(() -> {
                                 General.sleep(General.randomSD(750, 90));
@@ -66,8 +66,7 @@ public class HandleCombat implements Task {
                         General.sleep(General.randomSD(600, 70));
                     }
                 } else {
-                    if (dragon == null) {  //at the moment the script is crashing when both dragons are dead, so I don't think it is reading
-                        //this line
+                    if (dragon == null) {  
                         System.out.println("Idle while waiting for dragons to spawn");
                         General.sleep(General.randomSD(1500, 45));
                     }
