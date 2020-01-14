@@ -39,7 +39,7 @@ public class HandleBanking implements Task {
 
     @Override
     public boolean validate() {
-        return (Inventory.find(food).length == 0 && Inventory.isFull()) || (Inventory.find(food).length == 15 && Player.getPosition().equals(bankTile) && Banking.isBankScreenOpen()) ;
+        return (Inventory.find(food).length == 0 && Inventory.isFull()) || (Inventory.find(food).length == 15 && Player.getPosition().equals(bankTile) && Banking.isBankScreenOpen()) || (Inventory.find(food).length < 15 && Player.getPosition().equals(bankTile) && !Banking.isBankLoaded()) ;
     }
 
     @Override
