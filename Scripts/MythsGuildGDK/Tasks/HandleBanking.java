@@ -58,11 +58,11 @@ public class HandleBanking implements Task {
                     if (Cape != null && Cape.length > 0 && dragonArea.contains(Player.getPosition())) {
                         if (Cape[0].click("Teleport")) {
                             Timing.waitCondition(() -> {
-                                General.sleep(General.randomSD(1500, 30));
+                                General.sleep(General.randomSD(2000, 30));
                                 return mythsTeleportArea.contains(Player.getPosition());
                                     }, General.random(300, 400));
                             }
-                            General.sleep(General.randomSD(750, 45));
+                            General.sleep(General.randomSD(450, 45));
                         }
                         System.out.println("Teleporting to the Myths Guild. Moving to bank.");
                     }
@@ -151,7 +151,7 @@ public class HandleBanking implements Task {
                                 }, General.random(1000, 3000));
                             }
                             else {
-                                if (Player.getPosition().equals(bankTile) && !Banking.isBankScreenOpen() && (!(Inventory.find(food).length == 15) || (Inventory.isFull() && Inventory.find(food).length == 0))) {
+                                if (Player.getPosition().equals(bankTile) && !Banking.isBankScreenOpen() && (!(Inventory.find(food).length == 15))) {
                                     Banking.openBank();
                                     System.out.println("Player is idle at bank, opening bank...");
                                     General.sleep(2000, 3000);
@@ -175,7 +175,7 @@ public class HandleBanking implements Task {
 
 
                 if (Inventory.find(food).length == 15 && Inventory.find(dragonLoot).length == 0 && Banking.isBankScreenOpen()) {
-                    System.out.println("Bank is still open, attempting to close...");
+                    System.out.println("[BANKING_FAILSAFE]: Bank is still open, attempting to close...");
                     Banking.close();
                     Timing.waitCondition(() -> {
                         General.sleep(600, 750);
@@ -185,6 +185,31 @@ public class HandleBanking implements Task {
                         System.out.println("[BANKING_FAILSAFE]: Bank successfully closed.");
                     }
 
+                } else {
+                    if ((!(Inventory.find(food).length == 15)) && !Banking.isBankScreenOpen() && Player.getPosition().equals(bankTile)) {
+                        System.out.println("[BANKING_FAILSAFE]: Player is standing at bank, but is not equipped properly. Attempting to open bank...");
+                        Banking.openBank();
+                        Timing.waitCondition(() -> {
+                            General.sleep(300, 500);
+                            return Banking.isBankScreenOpen() && Banking.isBankLoaded();
+                        }, General.random(300, 400));
+                        System.out.println(("[BANKING_FAILSAFE]: Bank successfully opened. Attempting to deposit items..."));
+                        if (Banking.isBankScreenOpen() && !(Inventory.find(food).length == 15) && Player.getPosition().equals(bankTile)) {
+                            Banking.depositAllExcept(mythicalCape);
+                            if (Inventory.getAll().length == 1) {
+                                System.out.println("[BANKING_FAILSAFE]: Successfully deposited all items. Attempting to withdraw food...");
+                                Banking.withdraw(15, food);
+                                if (Inventory.find(food).length == 15) {
+                                    System.out.println("[BANKING_FAILSAFE]: Successfully withdrawn food...");
+                                } else {
+                                    General.sleep(400, 1200);
+                                }
+                            } else {
+                                General.sleep(400, 1200);
+                            }
+
+                        }
+                    }
                 }
                 break;
 
