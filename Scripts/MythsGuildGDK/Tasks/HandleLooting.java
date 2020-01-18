@@ -38,7 +38,7 @@ public class HandleLooting implements Task {
 
     @Override
     public boolean validate() {
-        return GroundItems.find(dragonLoot).length > 0 && (!Inventory.isFull() || (Inventory.isFull() && Inventory.find(food).length > 0));
+        return GroundItems.find(dragonLoot).length > 0 && (!Inventory.isFull() || Inventory.find(food).length > 0); // removed Inventory.isfull()
 
     }
 
@@ -52,29 +52,32 @@ public class HandleLooting implements Task {
 
                 ItemEntity isEdible = Entities.find(ItemEntity::new)
                         .actionsEquals("Eat");
-
-
-
                 if (isEdible != null) {
                     RSItem[] edible = Inventory.find(food);
                     if (edible != null && edible.length > 0) {
                         if (edible[0].click("Eat")) {
                             General.sleep(General.randomSD(750, 45));
                         }
-                        System.out.println("Eating food to create inventory space, new health is now:" + Combat.getHP());
+                        System.out.println("HandleLooting: Eating food to create inventory space, new health is now:" + Combat.getHP());
                     }
                 }
                     break;
 
             case LOOTING:
-                if (!Inventory.isFull() && Inventory.find(food).length >= 0) {
+                if (!Inventory.isFull()) { // removed this, if this stops working correctly place back... && Inventory.find(food).length >= 0) {
                     if (loot != null) {
                         RSGroundItem[] groundLoot = GroundItems.find(dragonLoot);
                         if (groundLoot != null & groundLoot.length > 0) {
-                            if (groundLoot[0].click("Take " + groundLoot[0].getDefinition().getName())) {
-                                General.sleep(General.randomSD(430, 80));
+                            if (groundLoot[0].isClickable()) {
+                                if (groundLoot[0].click("Take " + groundLoot[0].getDefinition().getName())) {
+                                    General.sleep(General.randomSD(430, 80));
+                                    System.out.println("HandleLooting: Looting items...");
+                                }
+                            } else {
+                                if (!groundLoot[0].isClickable() && groundLoot[0].adjustCameraTo()) {
+                                    System.out.println("HandleLooting: Rotating camera so that loot is visible.");
+                                }
                             }
-                            System.out.println("Looting items...");
                         }
                     }
 
@@ -86,6 +89,7 @@ public class HandleLooting implements Task {
 
                 if (dragonLoot.length == 0 && NPCs.find(dragon) == null) {
                     General.sleep(1200, 2000);
+                    System.out.println("HandleLooting: There is no loot, and no dragons available... Idling.");
                 }
                 break;
         }
