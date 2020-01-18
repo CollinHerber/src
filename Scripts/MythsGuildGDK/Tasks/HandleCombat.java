@@ -3,10 +3,7 @@ package scripts.MythsGuildGDK.Tasks;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
-import org.tribot.api2007.Combat;
-import org.tribot.api2007.Inventory;
-import org.tribot.api2007.Player;
-import org.tribot.api2007.Walking;
+import org.tribot.api2007.*;
 import org.tribot.api2007.types.*;
 
 import scripts.MythsGuildGDK.Antiban.PersistantABCUtil;
@@ -19,9 +16,13 @@ public class HandleCombat implements Task {
 
     private static int eatAtHP = Combat.getMaxHP() / 2;
     private static String[] food = {"Lobster"};
-    private static final RSArea dragonArea = new RSArea(new RSTile[]{new RSTile(1947, 8987, 1), new RSTile(1936, 8987, 1), new RSTile(1936, 8994, 1), new RSTile(1939, 8994, 1), new RSTile(1941, 8995, 1), new RSTile(1943, 8997, 1), new RSTile(1944, 8999, 1), new RSTile(1945, 9000, 1), new RSTile(1946, 9000, 1), new RSTile(1947, 9000, 1), new RSTile(1948, 9000, 1), new RSTile(1949, 8999, 1), new RSTile(1950, 8998, 1), new RSTile(1950, 8997, 1), new RSTile(1949, 8995, 1), new RSTile(1948, 8994, 1), new RSTile(1947, 8994, 1), new RSTile(1946, 8993, 1)});
+    public static final RSArea greenDragonArea = new RSArea(new RSTile [] { new RSTile(1946, 8989, 1),new RSTile(1941, 8989, 1),new RSTile(1941, 8996, 1),new RSTile(1943, 8998, 1),new RSTile(1944, 8998, 1),new RSTile(1944, 8999, 1),new RSTile(1944, 9000, 1),new RSTile(1945, 9001, 1),new RSTile(1946, 9001, 1),new RSTile(1947, 9000, 1),new RSTile(1948, 8999, 1),new RSTile(1949, 8999, 1),new RSTile(1950, 8998, 1),new RSTile(1950, 8997, 1),new RSTile(1949, 8996, 1),new RSTile(1947, 8996, 1),new RSTile(1946, 8995, 1),new RSTile(1946, 8994, 1),new RSTile(1945, 8993, 1),new RSTile(1945, 8991, 1),new RSTile(1946, 8991, 1) });
+    public static final RSArea dragonArea = new RSArea(new RSTile [] { new RSTile(1944, 9002, 1),new RSTile(1946, 9002, 1),new RSTile(1948, 9001, 1),new RSTile(1949, 9000, 1),new RSTile(1951, 8999, 1),new RSTile(1952, 8999, 1),new RSTile(1952, 8997, 1),new RSTile(1951, 8996, 1),new RSTile(1950, 8995, 1),new RSTile(1949, 8995, 1),new RSTile(1948, 8995, 1),new RSTile(1947, 8994, 1),new RSTile(1947, 8993, 1),new RSTile(1947, 8991, 1),new RSTile(1948, 8990, 1),new RSTile(1948, 8988, 1),new RSTile(1948, 8986, 1),new RSTile(1944, 8986, 1),new RSTile(1943, 8987, 1),new RSTile(1940, 8987, 1),new RSTile(1940, 8986, 1),new RSTile(1939, 8985, 1),new RSTile(1938, 8984, 1),new RSTile(1937, 8984, 1),new RSTile(1931, 8984, 1),new RSTile(1928, 8984, 1),new RSTile(1930, 8994, 1),new RSTile(1932, 8995, 1),new RSTile(1934, 8995, 1),new RSTile(1935, 8995, 1),new RSTile(1936, 8994, 1),new RSTile(1938, 8994, 1),new RSTile(1938, 8996, 1),new RSTile(1940, 8997, 1),new RSTile(1941, 8997, 1),new RSTile(1942, 8998, 1),new RSTile(1942, 8999, 1),new RSTile(1942, 9001, 1) });
 
-// dragon death animations I have found are 28, 92, 4642
+    RSNPC greenDragon = Entities.find(NpcEntity::new).nameEquals("Green dragon").actionsEquals("Attack")
+            .sortByDistance()
+            .getFirstResult();
+        // dragon death animations I have found are 28, 92, 4642
 
     @Override
     public Priority priority() {
@@ -35,7 +36,7 @@ public class HandleCombat implements Task {
 
     @Override
     public boolean validate() {
-        return Inventory.find(food).length > 0 && dragonArea.contains(Player.getPosition());
+        return Inventory.find(food).length > 0 && (dragonArea.contains(Player.getPosition()) || (greenDragon.isOnScreen() && !dragonArea.contains(Player.getPosition())) || greenDragon.isOnScreen() && !(Combat.getTargetEntity() == greenDragon));
     }
 
     @Override
@@ -55,7 +56,7 @@ public class HandleCombat implements Task {
                         General.sleep(General.randomSD(325, 45));
                     }
                     if (!dragon.isInCombat()) { //can add here the death animation check
-                        if (DynamicClicking.clickRSNPC(dragon, "Attack")) { 
+                        if (DynamicClicking.clickRSNPC(dragon, "Attack")) {
                             System.out.println("Attacking dragon...");
                             Timing.waitCondition(() -> {
                                 General.sleep(General.randomSD(750, 90));
@@ -66,8 +67,8 @@ public class HandleCombat implements Task {
                         General.sleep(General.randomSD(600, 70));
                     }
                 } else {
-                    if (dragon == null) {  
-                        System.out.println("Idle while waiting for dragons to spawn");
+                    if (dragon == null) {
+                        System.out.println("HandleCombat: Idle while waiting for dragons to spawn");
                         General.sleep(General.randomSD(1500, 45));
                     }
                 }
@@ -85,7 +86,7 @@ public class HandleCombat implements Task {
                             if (edible[0].click("Eat")) {
                                 General.sleep(General.randomSD(750, 45));
                             }
-                            System.out.println("Eating food, new health is now:" + Combat.getHP());
+                            System.out.println("HandleCombat: Eating food, new health is now:" + Combat.getHP());
                         }
 
                 }
@@ -93,8 +94,8 @@ public class HandleCombat implements Task {
 
             case RETURN_TO_COMBAT_ZONE:
 
-                Walking.walkTo(dragonArea.getRandomTile());
-                System.out.println("Player has left combat area, returning to combat area...");
+                Walking.walkTo(greenDragonArea.getRandomTile());
+                System.out.println("HandleCombat: Player has left combat area, returning to combat area...");
                 while (Player.isMoving()) {
                     PersistantABCUtil.handleIdleActions();
                     General.sleep(1200, 1800);
@@ -103,10 +104,11 @@ public class HandleCombat implements Task {
                 break;
 
                 case IDLE_IN_COMBAT:
+
                         if (Combat.isUnderAttack() && Combat.getMaxHP() > eatAtHP) {
-                            System.out.println("Under attack. Idling and performing ABC actions...");
+                            System.out.println("HandleCombat: Under attack. Idling and performing ABC actions...");
                                 PersistantABCUtil.handleIdleActions();
-                                General.sleep(3000, 5000);
+                                General.sleep(General.randomSD(2450, 450));
                             }
                     break;
         }
