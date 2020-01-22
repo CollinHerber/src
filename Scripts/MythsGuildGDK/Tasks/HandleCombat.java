@@ -16,10 +16,10 @@ public class HandleCombat implements Task {
 
     private static int eatAtHP = Combat.getMaxHP() / 2;
     private static String[] food = {"Lobster"};
-    public static final RSArea greenDragonArea = new RSArea(new RSTile [] { new RSTile(1946, 8989, 1),new RSTile(1941, 8989, 1),new RSTile(1941, 8996, 1),new RSTile(1943, 8998, 1),new RSTile(1944, 8998, 1),new RSTile(1944, 8999, 1),new RSTile(1944, 9000, 1),new RSTile(1945, 9001, 1),new RSTile(1946, 9001, 1),new RSTile(1947, 9000, 1),new RSTile(1948, 8999, 1),new RSTile(1949, 8999, 1),new RSTile(1950, 8998, 1),new RSTile(1950, 8997, 1),new RSTile(1949, 8996, 1),new RSTile(1947, 8996, 1),new RSTile(1946, 8995, 1),new RSTile(1946, 8994, 1),new RSTile(1945, 8993, 1),new RSTile(1945, 8991, 1),new RSTile(1946, 8991, 1) });
-    public static final RSArea dragonArea = new RSArea(new RSTile [] { new RSTile(1944, 9002, 1),new RSTile(1946, 9002, 1),new RSTile(1948, 9001, 1),new RSTile(1949, 9000, 1),new RSTile(1951, 8999, 1),new RSTile(1952, 8999, 1),new RSTile(1952, 8997, 1),new RSTile(1951, 8996, 1),new RSTile(1950, 8995, 1),new RSTile(1949, 8995, 1),new RSTile(1948, 8995, 1),new RSTile(1947, 8994, 1),new RSTile(1947, 8993, 1),new RSTile(1947, 8991, 1),new RSTile(1948, 8990, 1),new RSTile(1948, 8988, 1),new RSTile(1948, 8986, 1),new RSTile(1944, 8986, 1),new RSTile(1943, 8987, 1),new RSTile(1940, 8987, 1),new RSTile(1940, 8986, 1),new RSTile(1939, 8985, 1),new RSTile(1938, 8984, 1),new RSTile(1937, 8984, 1),new RSTile(1931, 8984, 1),new RSTile(1928, 8984, 1),new RSTile(1930, 8994, 1),new RSTile(1932, 8995, 1),new RSTile(1934, 8995, 1),new RSTile(1935, 8995, 1),new RSTile(1936, 8994, 1),new RSTile(1938, 8994, 1),new RSTile(1938, 8996, 1),new RSTile(1940, 8997, 1),new RSTile(1941, 8997, 1),new RSTile(1942, 8998, 1),new RSTile(1942, 8999, 1),new RSTile(1942, 9001, 1) });
+    private static final RSArea greenDragonArea = new RSArea(new RSTile [] { new RSTile(1946, 8989, 1),new RSTile(1941, 8989, 1),new RSTile(1941, 8996, 1),new RSTile(1943, 8998, 1),new RSTile(1944, 8998, 1),new RSTile(1944, 8999, 1),new RSTile(1944, 9000, 1),new RSTile(1945, 9001, 1),new RSTile(1946, 9001, 1),new RSTile(1947, 9000, 1),new RSTile(1948, 8999, 1),new RSTile(1949, 8999, 1),new RSTile(1950, 8998, 1),new RSTile(1950, 8997, 1),new RSTile(1949, 8996, 1),new RSTile(1947, 8996, 1),new RSTile(1946, 8995, 1),new RSTile(1946, 8994, 1),new RSTile(1945, 8993, 1),new RSTile(1945, 8991, 1),new RSTile(1946, 8991, 1) });
+    public static final RSArea dragonArea = new RSArea(new RSTile [] { new RSTile(1937, 9000, 1),new RSTile(1944, 9006, 1),new RSTile(1954, 8999, 1),new RSTile(1951, 8992, 1),new RSTile(1947, 8986, 1),new RSTile(1940, 8986, 1),new RSTile(1937, 8982, 1),new RSTile(1935, 8979, 1),new RSTile(1927, 8978, 1),new RSTile(1924, 8999, 1) });
 
-    RSNPC greenDragon = Entities.find(NpcEntity::new).nameEquals("Green dragon").actionsEquals("Attack")
+    private RSNPC greenDragon = Entities.find(NpcEntity::new).nameEquals("Green dragon").actionsEquals("Attack")
             .sortByDistance()
             .getFirstResult();
         // dragon death animations I have found are 28, 92, 4642
@@ -49,13 +49,12 @@ public class HandleCombat implements Task {
                 RSNPC dragon = Entities.find(NpcEntity::new).nameEquals("Green dragon").actionsEquals("Attack")
                         .sortByDistance()
                         .getFirstResult();
-
                 if (dragon != null) {
 
                     if (!dragon.isClickable() && dragon.adjustCameraTo()) { //this is short circuiting. If the first isn't reached the other will be performed.
                         General.sleep(General.randomSD(325, 45));
                     }
-                    if (!dragon.isInCombat()) { //can add here the death animation check
+                    if (!dragon.isInCombat()) {//can add here the death animation check
                         if (DynamicClicking.clickRSNPC(dragon, "Attack")) {
                             System.out.println("Attacking dragon...");
                             Timing.waitCondition(() -> {
@@ -69,6 +68,7 @@ public class HandleCombat implements Task {
                 } else {
                     if (dragon == null) {
                         System.out.println("HandleCombat: Idle while waiting for dragons to spawn");
+                        PersistantABCUtil.handleIdleActions();
                         General.sleep(General.randomSD(1500, 45));
                     }
                 }
