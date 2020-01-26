@@ -45,9 +45,12 @@ public class Main extends Script implements InventoryListener, Painting {
     @Override
     public void run() {
 
+        sleep(500);
+        General.useAntiBanCompliance(true);
+        Antiban.create();
+        Antiban.setPrintDebug(true);
+        
         startTime = Timing.currentTimeMillis();
-
-        PersistantABCUtil.get();
         PersistantABCUtil.generateRunPercentage();
 
         System.out.println("Welcome to Elliott's Myths Guild GDK Beta.");
@@ -117,6 +120,8 @@ public class Main extends Script implements InventoryListener, Painting {
     public static void stopScript(String reason){
         General.println("Script stopped : " + reason);
         Vars.get().shouldRun = false;
+        Antiban.destroy();
+
     }
 
     @Override
