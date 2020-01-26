@@ -12,6 +12,7 @@ import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 
+import scripts.MythsGuildGDK.Antiban.Antiban;
 import scripts.MythsGuildGDK.Antiban.PersistantABCUtil;
 import scripts.MythsGuildGDK.Tasks.HandleBanking;
 import scripts.MythsGuildGDK.Tasks.HandleCombat;
@@ -49,28 +50,29 @@ public class Main extends Script implements InventoryListener, Painting {
         General.useAntiBanCompliance(true);
         Antiban.create();
         Antiban.setPrintDebug(true);
-        
-        startTime = Timing.currentTimeMillis();
-        PersistantABCUtil.generateRunPercentage();
 
-        System.out.println("Welcome to Elliott's Myths Guild GDK Beta.");
-        System.out.println("If you find any bugs please let me know. Happy botting!");
+        startTime = Timing.currentTimeMillis();
+
+        PersistantABCUtil.generateRunPercentage();
+        PersistantABCUtil.activateRun();
+
+        General.println("Welcome to Elliott's Myths Guild GDK Beta.");
+        General.println("If you find any bugs please let me know. Happy botting!");
 
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
             public DaxCredentials getDaxCredentials() {
-                return new DaxCredentials("PRIVATE-KEY", "PUBLIC-KEY");
+                return new DaxCredentials("sub_DPjXXzL5DeSiPf", "PUBLIC-KEY");
             }
         });
 
         if (Login.getLoginState().equals(Login.STATE.LOGINSCREEN)) {
             Login.login();
-            System.out.println("[LOGIN]: Logging in...");
+            General.println("[LOGIN]: Logging in...");
             if (Login.getLoginState().equals(Login.STATE.INGAME)) {
-                System.out.println("[LOGIN]: Successfully logged in.");
+                General.println("[LOGIN]: Successfully logged in.");
             }
         }
-        PersistantABCUtil.activateRun();
 
         addTasks();
 
@@ -121,7 +123,6 @@ public class Main extends Script implements InventoryListener, Painting {
         General.println("Script stopped : " + reason);
         Vars.get().shouldRun = false;
         Antiban.destroy();
-
     }
 
     @Override
