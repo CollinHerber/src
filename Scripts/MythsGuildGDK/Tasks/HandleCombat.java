@@ -14,7 +14,7 @@ import scripts.MythsGuildGDK.framework.*;
 
 public class HandleCombat implements Task {
 
-    private static int eatAtHP = Combat.getMaxHP() / 2;
+    private static int eatAtHP = PersistantABCUtil.getEatPercentage();
     private static String[] food = {"Lobster"};
     private static final RSArea greenDragonArea = new RSArea(new RSTile [] { new RSTile(1946, 8989, 1),new RSTile(1941, 8989, 1),new RSTile(1941, 8996, 1),new RSTile(1943, 8998, 1),new RSTile(1944, 8998, 1),new RSTile(1944, 8999, 1),new RSTile(1944, 9000, 1),new RSTile(1945, 9001, 1),new RSTile(1946, 9001, 1),new RSTile(1947, 9000, 1),new RSTile(1948, 8999, 1),new RSTile(1949, 8999, 1),new RSTile(1950, 8998, 1),new RSTile(1950, 8997, 1),new RSTile(1949, 8996, 1),new RSTile(1947, 8996, 1),new RSTile(1946, 8995, 1),new RSTile(1946, 8994, 1),new RSTile(1945, 8993, 1),new RSTile(1945, 8991, 1),new RSTile(1946, 8991, 1) });
     public static final RSArea dragonArea = new RSArea(new RSTile [] { new RSTile(1937, 9000, 1),new RSTile(1944, 9006, 1),new RSTile(1954, 8999, 1),new RSTile(1951, 8992, 1),new RSTile(1947, 8986, 1),new RSTile(1940, 8986, 1),new RSTile(1937, 8982, 1),new RSTile(1935, 8979, 1),new RSTile(1927, 8978, 1),new RSTile(1924, 8999, 1) });
@@ -87,6 +87,8 @@ public class HandleCombat implements Task {
                                 General.sleep(General.randomSD(750, 45));
                             }
                             System.out.println("HandleCombat: Eating food, new health is now:" + Combat.getHP());
+                            PersistantABCUtil.generateEatPercentage();
+
                         }
 
                 }
