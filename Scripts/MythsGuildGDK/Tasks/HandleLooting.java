@@ -60,7 +60,7 @@ public class HandleLooting implements Task {
                         if (edible[0].click("Eat")) {
                             General.sleep(General.randomSD(750, 45));
                         }
-                        System.out.println("HandleLooting: Eating food to create inventory space, new health is now:" + Combat.getHP());
+                        General.println("HandleLooting: Eating food to create inventory space, new health is now:" + Combat.getHP());
                     }
                 }
                     break;
@@ -73,11 +73,11 @@ public class HandleLooting implements Task {
                             if (groundLoot[0].isClickable()) {
                                 if (groundLoot[0].click("Take " + groundLoot[0].getDefinition().getName())) {
                                     General.sleep(General.randomSD(430, 80));
-                                    System.out.println("HandleLooting: Looting items...");
+                                    General.println("HandleLooting: Looting items...");
                                 }
                             } else {
                                 if (!groundLoot[0].isClickable() && groundLoot[0].adjustCameraTo()) {
-                                    System.out.println("HandleLooting: Rotating camera so that loot is visible.");
+                                    General.println("HandleLooting: Rotating camera so that loot is visible.");
                                 }
                             }
                         }
@@ -91,7 +91,7 @@ public class HandleLooting implements Task {
 
                 if (dragonLoot.length == 0 && NPCs.find(dragon) == null) {
                     General.sleep(1200, 2000);
-                    System.out.println("HandleLooting: There is no loot, and no dragons available... Idling.");
+                    General.println("HandleLooting: There is no loot, and no dragons available... Idling.");
                 }
                 break;
         }
