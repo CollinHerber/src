@@ -51,12 +51,12 @@ public class HandleCombat implements Task {
                         .getFirstResult();
                 if (dragon != null) {
 
-                    if (!dragon.isClickable() && dragon.adjustCameraTo()) { //this is short circuiting. If the first isn't reached the other will be performed.
+                    if (!dragon.isClickable() && dragon.adjustCameraTo()) {     //this is short circuiting. If the first isn't reached the other will be performed.
                         General.sleep(General.randomSD(325, 45));
                     }
-                    if (!dragon.isInCombat()) {//can add here the death animation check
+                    if (!dragon.isInCombat()) {         //can add here the death animation check
                         if (DynamicClicking.clickRSNPC(dragon, "Attack")) {
-                            System.out.println("Attacking dragon...");
+                            General.println("Attacking dragon...");
                             Timing.waitCondition(() -> {
                                 General.sleep(General.randomSD(750, 90));
                                 return Combat.isUnderAttack();
@@ -66,7 +66,7 @@ public class HandleCombat implements Task {
                     }
                 } else {
                     if (dragon == null) {
-                        System.out.println("HandleCombat: Idle while waiting for dragons to spawn");
+                        General.println("HandleCombat: Idle while waiting for dragons to spawn");
                         PersistantABCUtil.handleIdleActions();
                         General.sleep(General.randomSD(1500, 45));
                     }
@@ -85,9 +85,8 @@ public class HandleCombat implements Task {
                             if (edible[0].click("Eat")) {
                                 General.sleep(General.randomSD(750, 45));
                             }
-                            System.out.println("HandleCombat: Eating food, new health is now:" + Combat.getHP());
+                            General.println("HandleCombat: Eating food, new health is now:" + Combat.getHP());
                             PersistantABCUtil.generateEatPercentage();
-
                         }
 
                 }
@@ -96,7 +95,7 @@ public class HandleCombat implements Task {
             case RETURN_TO_COMBAT_ZONE:
 
                 Walking.walkTo(greenDragonArea.getRandomTile());
-                System.out.println("HandleCombat: Player has left combat area, returning to combat area...");
+                General.println("HandleCombat: Player has left combat area, returning to combat area...");
                 while (Player.isMoving()) {
                     PersistantABCUtil.handleIdleActions();
                     General.sleep(1200, 1800);
@@ -107,7 +106,7 @@ public class HandleCombat implements Task {
                 case IDLE_IN_COMBAT:
 
                         if (Combat.isUnderAttack() && Combat.getMaxHP() > eatAtHP) {
-                            System.out.println("HandleCombat: Under attack. Idling and performing ABC actions...");
+                            General.println("HandleCombat: Under attack. Idling and performing ABC actions...");
                                 PersistantABCUtil.handleIdleActions();
                                 General.sleep(General.randomSD(2450, 450));
                             }
@@ -130,7 +129,7 @@ public class HandleCombat implements Task {
             if (!Combat.isUnderAttack() && Inventory.find(food).length >= 1) {
                 return TaskState.ATTACKING_DRAGON;
             }
-            if (Combat.getHP() < eatAtHP) { //this was embarrassing, I had these the wrong way round for way too long not understanding why it was always eating
+            if (Combat.getHP() < eatAtHP) {     //this was embarrassing, I had these the wrong way round for way too long not understanding why it was always eating
                 return TaskState.EATING_FOOD;
             }
             if (Inventory.find(food).length > 0 && !dragonArea.contains(Player.getPosition())){
