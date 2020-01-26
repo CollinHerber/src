@@ -64,7 +64,7 @@ public class HandleBanking implements Task {
                         }
                         General.sleep(General.randomSD(450, 45));
                     }
-                    System.out.println("Teleporting to the Myths Guild. Moving to bank.");
+                    General.println("Teleporting to the Myths Guild. Moving to bank.");
                 }
                 break;
 
@@ -85,11 +85,11 @@ public class HandleBanking implements Task {
                                     General.sleep(General.randomSD(750, 90));
                                     return !Player.isMoving();
                                 }, General.random(400, 1200));
-                                System.out.println("Climbing stairs.");
+                                General.println("Climbing stairs.");
                             } else {
                                 if (!stairCase[0].click("Climb-up")) {
                                     if (!bottomOfStairs.isClickable() && bottomOfStairs.adjustCameraTo()) {
-                                        System.out.println("Rotating camera so stairs are visible...");
+                                        General.println("Rotating camera so stairs are visible...");
                                         General.sleep(General.randomSD(450, 40));
                                     }
                                 }
@@ -105,7 +105,7 @@ public class HandleBanking implements Task {
 
                 if (bankArea.contains(Player.getPosition()) && !Banking.isBankScreenOpen()) {
                     if (!bankTile.isClickable() && bankTile.adjustCameraTo()) {
-                        System.out.println("Banking: Rotating camera towards bank tile.");
+                        General.println("Banking: Rotating camera towards bank tile.");
                         General.sleep(General.randomSD(450, 34));
                     }
                 }
@@ -124,7 +124,7 @@ public class HandleBanking implements Task {
 
                 if (Banking.isBankLoaded()) {
                     if (Inventory.find(dragonLoot).length > 0) {
-                        System.out.println("Bank is open, attempting to deposit all...");
+                        General.println("Bank is open, attempting to deposit all...");
                         Banking.depositAllExcept(mythicalCape);
                         Timing.waitCondition(() -> {
                                     General.sleep(General.randomSD(300, 120));
@@ -133,22 +133,22 @@ public class HandleBanking implements Task {
                                 General.random(1000, 1500));
                     }
                     if (!Inventory.isFull()) {
-                        System.out.println("We have successfully deposited all loot.");
+                        General.println("We have successfully deposited all loot.");
                         Banking.withdraw(5, food);
                         Timing.waitCondition(() -> {
                             General.sleep(General.randomSD(500,45));
                             return Inventory.find(food).length > 0;
                                 },
                                 General.random(450, 650));
-                        System.out.println("Attempting to withdraw food...");
+                        General.println("Attempting to withdraw food...");
                         General.sleep(General.randomSD(700, 70));
 
                     }
                     if (Inventory.find(food).length == 5 && Inventory.find(dragonLoot).length == 0) {
-                            System.out.println("We have successfully withdrawn 5 food. Attempting to close bank...");
+                            General.println("We have successfully withdrawn 5 food. Attempting to close bank...");
                             Banking.close();
                             if (!Banking.isBankScreenOpen()) {
-                                System.out.println("Bank closed successfully.");
+                                General.println("Bank closed successfully.");
                                 //suggestion Improve by using the Esc keys to close bank as that is more human-like
                             }
                         }
@@ -158,29 +158,29 @@ public class HandleBanking implements Task {
             case BANKING_FAILSAFE:
 
                 if (Inventory.find(food).length == 5 && Inventory.find(dragonLoot).length == 0 && Banking.isBankScreenOpen()) {
-                    System.out.println("[BANKING_FAILSAFE]: Bank is still open, attempting to close...");
+                    General.println("[BANKING_FAILSAFE]: Bank is still open, attempting to close...");
                     Banking.close();
                     Timing.waitCondition(() -> {
                         General.sleep(600, 750);
                         return !Banking.isBankScreenOpen();
                     }, General.random(700, 1300));
                     if (!Banking.isBankScreenOpen()) {
-                        System.out.println("[BANKING_FAILSAFE]: Bank successfully closed.");
+                        General.println("[BANKING_FAILSAFE]: Bank successfully closed.");
                     }
 
                 } else {
                     if ((!(Inventory.find(food).length == 5)) && !Banking.isBankScreenOpen() && Player.getPosition().equals(bankTile)) {
-                        System.out.println("[BANKING_FAILSAFE]: Player is standing at bank, but is not equipped properly. Attempting to open bank...");
+                        General.println("[BANKING_FAILSAFE]: Player is standing at bank, but is not equipped properly. Attempting to open bank...");
                         Banking.openBank();
                         Timing.waitCondition(() -> {
                             General.sleep(300, 500);
                             return Banking.isBankScreenOpen() && Banking.isBankLoaded();
                         }, General.random(300, 400));
-                        System.out.println(("[BANKING_FAILSAFE]: Bank successfully opened. Attempting to deposit items..."));
+                        General.println(("[BANKING_FAILSAFE]: Bank successfully opened. Attempting to deposit items..."));
                         if (Banking.isBankScreenOpen() && !(Inventory.find(food).length == 5) && Player.getPosition().equals(bankTile)) {
                             Banking.depositAllExcept(mythicalCape);
                             if (Inventory.getAll().length == 1) {
-                                System.out.println("[BANKING_FAILSAFE]: Successfully deposited all items. Attempting to withdraw food...");
+                                General.println("[BANKING_FAILSAFE]: Successfully deposited all items. Attempting to withdraw food...");
                                 Banking.withdraw(5, food);
                                 Timing.waitCondition(() -> {
                                             General.sleep(General.randomSD(500,45));
@@ -188,7 +188,7 @@ public class HandleBanking implements Task {
                                         },
                                         General.random(450, 650));
                                 if (Inventory.find(food).length == 5) {
-                                    System.out.println("[BANKING_FAILSAFE]: Successfully withdrawn food...");
+                                    General.println("[BANKING_FAILSAFE]: Successfully withdrawn food...");
                                 } else {
                                     General.sleep(400, 600);
                                 }
@@ -201,11 +201,11 @@ public class HandleBanking implements Task {
                 }
                 if (Banking.isBankLoaded() && Inventory.find(food).length > 0 && Inventory.find(dragonLoot).length > 0) {
                     Banking.depositAllExcept(mythicalCape);
-                    System.out.println("[BANKING_FAILSAFE]: Incorrect inventory setup. Attempting to deposit items...");
+                    General.println("[BANKING_FAILSAFE]: Incorrect inventory setup. Attempting to deposit items...");
                 }
                 if (Banking.isBankLoaded() && Inventory.find(food).length > 5) {
                     Banking.depositAllExcept(mythicalCape);
-                    System.out.println("[BANKING_FAILSAFE]: Withdrew too much food, reattempting banking.");
+                    General.println("[BANKING_FAILSAFE]: Withdrew too much food, reattempting banking.");
                 }
 
                 break;
