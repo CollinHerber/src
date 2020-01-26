@@ -62,7 +62,6 @@ public class HandleCombat implements Task {
                                 return Combat.isUnderAttack();
                             }, General.random(3000, 4000));
                         }
-                       // add if statement to say if click was successful and player is moving don't reclick
                         General.sleep(General.randomSD(600, 70));
                     }
                 } else {
