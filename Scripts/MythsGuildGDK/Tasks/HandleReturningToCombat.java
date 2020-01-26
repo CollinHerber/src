@@ -60,7 +60,7 @@ public class HandleReturningToCombat implements Task {
                                 return mythsTeleportArea.contains(Player.getPosition());
                             }, General.random(300, 400));
                         }
-                        System.out.println("HandleReturningToCombat: Teleporting to the Myths Guild. Returning to combat.");
+                        General.println("HandleReturningToCombat: Teleporting to the Myths Guild. Returning to combat.");
                     }
                 }
                 break;
@@ -72,7 +72,7 @@ public class HandleReturningToCombat implements Task {
                 if (mythsStatue != null && !dungeon.contains(Player.getPosition())) {
                     Clicking.click("Enter", mythsStatue);
                     Timing.waitCondition(() -> {
-                        System.out.println("HandleReturningToCombat: Attempting to enter the Myth's dungeon...");
+                        General.println("HandleReturningToCombat: Attempting to enter the Myth's dungeon...");
                         General.sleep(General.randomSD(1250, 60));
                         return Player.getPosition().equals(bottomOfLadder);
                             }, General.random(3000, 4000));
@@ -85,7 +85,7 @@ public class HandleReturningToCombat implements Task {
             case RETURNING_TO_DRAGONS:
 
                 if ((bottomOfLadderArea.contains(Player.getPosition())) || (bottomOfLadder.isOnScreen() && !dragonArea.contains(Player.getPosition()))) {
-                    System.out.println("HandleReturningToCombat: Player is in the Myth's dungeon, but not in the dragon area. Returning to dragons.");
+                    General.println("HandleReturningToCombat: Player is in the Myth's dungeon, but not in the dragon area. Returning to dragons.");
                     Walking.walkTo(greenDragonArea.getRandomTile());
                     General.sleep(General.random(2000, 230));
                     while (Player.isMoving()) {
@@ -98,7 +98,7 @@ public class HandleReturningToCombat implements Task {
             case COMPLETED_RETURNING_TO_COMBAT:
 
                 if (greenDragonArea.contains(Player.getPosition())) {
-                   System.out.println("HandleReturningToCombat: Successfully returned to Green dragons.");
+                   General.println("HandleReturningToCombat: Successfully returned to Green dragons.");
                    General.sleep(3000, 5000);
                 }
         }
