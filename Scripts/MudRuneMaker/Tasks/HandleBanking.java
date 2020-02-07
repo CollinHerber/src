@@ -9,6 +9,8 @@ import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.api2007.types.RSVarBit;
+import scripts.MudRuneMaker.Antiban.Antiban;
+import scripts.MudRuneMaker.Antiban.PersistantABCUtil;
 import scripts.MudRuneMaker.framework.Priority;
 import scripts.MudRuneMaker.framework.Task;
 import scripts.MudRuneMaker.entityselector.Entities;
@@ -49,15 +51,17 @@ public class HandleBanking implements Task {
 
             case OPENING_BANK:
                 Banking.openBank();
+                Antiban.leaveGame();
                 General.sleep(1300, 2400);
                 General.println("Opening bank");
                 break;
 
             case DEPOSITING_ITEMS:
                 Banking.depositAllExcept(inventoryItems);
-                General.println("Deposited all items except Varrock Teleports and Water runes...");
+                General.println("Deposited all items except Varrock teleport tabs and Water runes.");
                 if (Inventory.find(earthRunes).length > 0) {
                     Banking.depositAllExcept(inventoryItems);
+                    Antiban.leaveGame();
                 }
                 General.sleep(764, 1450);
                 break;
@@ -77,6 +81,7 @@ public class HandleBanking implements Task {
                         RSItem[] bindingNecklaceInventory = Inventory.find("Binding necklace");
                         if (bindingNecklaceInventory != null && bindingNecklaceInventory.length > 0) {
                             if (bindingNecklaceInventory[0].click("Wear")) {
+                                Antiban.waitItemInteractionDelay();
                                 Timing.waitCondition(() -> {
                                     General.sleep(General.randomSD(3000, 30));
                                     return Inventory.find("Binding necklace").length == 0;
@@ -148,6 +153,8 @@ public class HandleBanking implements Task {
                                 General.println("Drank one dose of Stamina potion (1).");
                         }
                     }
+                    Antiban.getReactionTime();
+                    Antiban.sleepReactionTime();
                 }
                 if (staminaPotionVarBit.getValue() == 1 && Inventory.find(staminaPotion).length > 0) {
                     Banking.depositAllExcept(inventoryItems);
@@ -172,6 +179,8 @@ public class HandleBanking implements Task {
                    General.sleep(679, 1123);
                }
                 General.println("BANKING: Withdrawn the required items");
+               Antiban.randomMovement();
+               Antiban.leaveGame();
 
                 break;
 
