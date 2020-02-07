@@ -43,6 +43,7 @@ public class Main extends Script implements Painting {
         General.useAntiBanCompliance(true);
 
         Antiban.create();
+        PersistantABCUtil.get();
         Antiban.setPrintDebug(true);
         Mouse.setSpeed(speed);
 
@@ -53,6 +54,7 @@ public class Main extends Script implements Painting {
 
         General.println("Welcome to Elliott's Mud Rune Maker.");
         General.println("If you find any bugs please let me know. Happy botting!");
+        General.println("Version 1.13 Key Update. Added ABC2 functionality, let me know how this changes you experience.");
         General.println("Profit is based on a Mud rune value of 350.");
 
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
@@ -138,7 +140,7 @@ public class Main extends Script implements Painting {
 
         g.setColor(Color.WHITE);
         g.drawString("Elliott's Mud Rune Maker", 10, 235);
-        g.drawString("Version: 1.12_1" , 10, 250);
+        g.drawString("Version: 1.13" , 10, 250);
         g.drawString("Task: " + Vars.get().status, 10, 265);
         g.drawString("Runtime: " + Timing.msToString(this.getRunningTime()), 10, 280);
         g.drawString("Runecrafting XP: " + (runecraftingXPGained) + " (" + runecraftingXPPerHour + ")", 10, 295);
