@@ -3,9 +3,12 @@ package scripts.MudRuneMaker.Tasks;
 import org.tribot.api.General;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
+
+import scripts.MudRuneMaker.Antiban.Antiban;
 import scripts.MudRuneMaker.Antiban.PersistantABCUtil;
 import scripts.MudRuneMaker.framework.Priority;
 import scripts.MudRuneMaker.framework.Task;
+
 import scripts.dax_api.api_lib.DaxWalker;
 import scripts.dax_api.api_lib.models.RunescapeBank;
 
@@ -49,6 +52,7 @@ public class HandleNavigatingToBank implements Task {
                 }
                 General.println("Returning to Varrock East Bank");
                 PersistantABCUtil.handleIdleActions();
+                Antiban.moveCamera();
         }
     }
 
