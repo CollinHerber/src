@@ -9,10 +9,11 @@ import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.api2007.types.RSVarBit;
+
 import scripts.MudRuneMaker.Antiban.Antiban;
-import scripts.MudRuneMaker.Antiban.PersistantABCUtil;
 import scripts.MudRuneMaker.framework.Priority;
 import scripts.MudRuneMaker.framework.Task;
+
 import scripts.MudRuneMaker.entityselector.Entities;
 import scripts.MudRuneMaker.entityselector.finders.prefabs.ItemEntity;
 
@@ -50,6 +51,7 @@ public class HandleBanking implements Task {
         switch (getTaskState()) {
 
             case OPENING_BANK:
+                Antiban.randomBankAfk();
                 Banking.openBank();
                 Antiban.leaveGame();
                 General.sleep(1300, 2400);
