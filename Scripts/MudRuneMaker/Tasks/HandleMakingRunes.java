@@ -9,6 +9,7 @@ import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
+import scripts.MudRuneMaker.Antiban.Antiban;
 import scripts.MudRuneMaker.framework.Priority;
 import scripts.MudRuneMaker.framework.Task;
 import scripts.dax_api.api_lib.DaxWalker;
@@ -54,6 +55,7 @@ public class HandleMakingRunes implements Task {
 
                 if (waterTalisman != null) {
                     if (waterTalisman[0].click("Use")) {
+                        Antiban.waitItemInteractionDelay();
                         if (Game.getUptext().contains("Use Water talisman")) {
                             RSObject[] earthAltar = Objects.find(30, "Altar");
                             if (earthAltar != null) {
@@ -62,6 +64,7 @@ public class HandleMakingRunes implements Task {
                                 }
                                      if (earthAltar[0].click()) {
                                          General.sleep(3500, 4230);
+                                         Antiban.timedActions();
                                           General.println("Making Mud runes.");
 
                                 }
