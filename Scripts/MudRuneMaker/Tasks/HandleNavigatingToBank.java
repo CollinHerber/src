@@ -39,7 +39,7 @@ public class HandleNavigatingToBank implements Task {
             case WALK_TO_BANK:
 
                 DaxWalker.walkToBank(RunescapeBank.VARROCK_EAST);
-                if (run_at > Game.getRunEnergy()) {
+                if (Game.getRunEnergy() >= run_at) {
                     if (!Game.isRunOn()) {
                         PersistantABCUtil.activateRun();
                         General.println("Turning on run.");
