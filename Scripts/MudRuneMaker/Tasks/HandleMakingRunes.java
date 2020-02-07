@@ -62,7 +62,7 @@ public class HandleMakingRunes implements Task {
                                 if (!earthAltar[0].isClickable() && earthAltar[0].adjustCameraTo()){
                                     General.sleep(862, 1323);
                                 }
-                                     if (earthAltar[0].click()) {
+                                     if (earthAltar[0].click("Use " + earthAltar[0].getDefinition().getName())) {
                                          General.sleep(3500, 4230);
                                          Antiban.timedActions();
                                           General.println("Making Mud runes.");
