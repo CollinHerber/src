@@ -9,7 +9,6 @@ import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 import scripts.MudRuneMaker.Antiban.PersistantABCUtil;
-import scripts.MudRuneMaker.Antiban.PersistentABCUtilOriginal;
 import scripts.MudRuneMaker.framework.Priority;
 import scripts.MudRuneMaker.framework.Task;
 import scripts.dax_api.api_lib.DaxWalker;
@@ -49,7 +48,7 @@ public class HandleNavigatingToAltar implements Task {
                 DaxWalker.walkTo(earthAltarEntrance);
                 General.println("Walking to Earth altar entrance");
 
-                if (run_at > Game.getRunEnergy()) {
+                if (Game.getRunEnergy() >= run_at) {
                     if (!Game.isRunOn()) {
                         PersistantABCUtil.activateRun();
                         General.println("Turning on run.");
