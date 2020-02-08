@@ -35,6 +35,8 @@ public class Main extends Script implements Painting {
     public double xpPerRune= 9.3;
     public long longXPPerRune = Math.round(xpPerRune);
     private long startRunecraftingXP = Skills.getXP(Skills.SKILLS.RUNECRAFTING);
+    private int costOfRune = 280;
+    private double versionNumber = 1.15;
 
     @Override
     public void run() {
@@ -54,9 +56,9 @@ public class Main extends Script implements Painting {
 
         General.println("Welcome to Elliott's Mud Rune Maker.");
         General.println("If you find any bugs please let me know. Happy botting!");
-        General.println("Version 1.14");
+        General.println("Version " + versionNumber);
         General.println("LATEST UPDATE: Added ABC2 functionality, let me know how this changes you experience.");
-        General.println("Profit is based on a Mud rune value of 350.");
+        General.println("Profit is based on a Mud rune value of " + costOfRune + ".");
 
         DaxWalker.setCredentials(new DaxCredentialsProvider() {
             @Override
@@ -135,13 +137,13 @@ public class Main extends Script implements Painting {
 
         long runesMade = runecraftingXPGained / longXPPerRune;
         long runesMadePerHouse = runesMade * (3600000 / timeRan);
-        long profit = runesMade * 350;
+        long profit = runesMade * costOfRune;
         long profitPerHour = profit * (3600000 / timeRan);
 
 
         g.setColor(Color.WHITE);
         g.drawString("Elliott's Mud Rune Maker", 10, 235);
-        g.drawString("Version: 1.14" , 10, 250);
+        g.drawString("Version: " + versionNumber , 10, 250);
         g.drawString("Task: " + Vars.get().status, 10, 265);
         g.drawString("Runtime: " + Timing.msToString(this.getRunningTime()), 10, 280);
         g.drawString("Runecrafting XP: " + (runecraftingXPGained) + " (" + runecraftingXPPerHour + ")", 10, 295);
