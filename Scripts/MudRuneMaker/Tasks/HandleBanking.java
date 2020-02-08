@@ -42,7 +42,7 @@ public class HandleBanking implements Task {
 
     @Override
     public boolean validate() {
-        return Banking.isInBank() && Inventory.find("Pure essence").length == 0;
+        return Banking.isInBank() && (!(Inventory.find("Pure essence").length == 25) || !(Inventory.find(watertalisman).length == 1));
     }
 
     @Override
@@ -170,17 +170,24 @@ public class HandleBanking implements Task {
                 }
                 break;
 
-            case WITHDRAWING_ITEMS:
+            case WITHDRAWING_PURE_ESSENCE:
 
                if (Inventory.find(pureEssence).length == 0) {
-                   Banking.withdraw(25, pureEssence);
-                   General.sleep(679, 1123);
-            }
+                       Banking.withdraw(25, pureEssence);
+                       General.sleep(679, 1123);
+                   }
+                General.println("BANKING: Withdrawn 25 Pure essence.");
+                Antiban.randomMovement();
+                Antiban.leaveGame();
+               break;
+
+            case WITHDRAWING_WATER_TALISMAN:
+
                if (Inventory.find(watertalisman).length == 0) {
                    Banking.withdraw(1, watertalisman);
                    General.sleep(679, 1123);
                }
-                General.println("BANKING: Withdrawn the required items");
+                General.println("BANKING: Withdrawn 1 Water talisman.");
                Antiban.randomMovement();
                Antiban.leaveGame();
 
@@ -190,8 +197,12 @@ public class HandleBanking implements Task {
 
                 Banking.depositAllExcept(inventoryItems);
                 General.sleep(850,1230);
+                if ((!(Inventory.find(pureEssence).length == 25)) || (Inventory.find(watertalisman).length > 1)) {
 
-            case CLOSING_BANK:
+                }
+                break;
+
+                case CLOSING_BANK:
                 Banking.close();
                 General.println("BANKING: Bank closed.");
 
@@ -206,7 +217,8 @@ public class HandleBanking implements Task {
         DEPOSITING_ITEMS,
         REQUIPPING_BINDING_NECKLACE,
         REDRINKING_STAMINA,
-        WITHDRAWING_ITEMS,
+        WITHDRAWING_PURE_ESSENCE,
+        WITHDRAWING_WATER_TALISMAN,
         BANKING_FAILSAFE,
         CLOSING_BANK
 
@@ -214,7 +226,7 @@ public class HandleBanking implements Task {
 
     private TaskState getTaskState() {
 
-        if (Banking.isInBank() && !Banking.isBankScreenOpen()) {
+        if (Banking.isInBank() && !Banking.isBankScreenOpen() && (Inventory.find(pureEssence).length != 25 || !(Inventory.find(watertalisman).length == 1))) {
             return TaskState.OPENING_BANK;
         }
         if (Banking.isBankScreenOpen() && Inventory.find("Mud rune").length > 0) {
@@ -226,10 +238,14 @@ public class HandleBanking implements Task {
         if (staminaPotionVarBit.getValue() != 1 && Banking.isBankScreenOpen()) {
             return TaskState.REDRINKING_STAMINA;
         }
-        if ((Inventory.find(pureEssence).length == 0 || Inventory.find(watertalisman).length == 0) && Banking.isBankScreenOpen()) {
-            return TaskState.WITHDRAWING_ITEMS;
+        if (Inventory.find(pureEssence).length == 0 && Banking.isBankScreenOpen()) {
+            return TaskState.WITHDRAWING_PURE_ESSENCE;
         }
-        if ((Inventory.find(watertalisman).length > 1) || (Inventory.find(staminaPotion).length > 0 && Inventory.find(pureEssence).length > 0) || (Inventory.find(bindingNecklace).length > 0 && Inventory.find(pureEssence).length > 0) || ((!(Inventory.find(pureEssence).length == 25)) && (Inventory.find(staminaPotion).length > 0 || Inventory.find(bindingNecklace).length > 0))) {
+        if (Inventory.find(watertalisman).length == 0 && Banking.isBankScreenOpen()) {
+            return TaskState.WITHDRAWING_WATER_TALISMAN;
+        }
+
+        if ((Inventory.find(watertalisman).length > 1) || (Inventory.find(staminaPotion).length > 0 && Inventory.find(pureEssence).length > 0) || (Inventory.find(bindingNecklace).length > 0 && Inventory.find(pureEssence).length > 0) || ((!(Inventory.find(pureEssence).length == 25)) && (Inventory.find(staminaPotion).length > 0 || Inventory.find(bindingNecklace).length > 0)) || (!(Inventory.find(pureEssence).length == 25)) && (Inventory.find(watertalisman).length > 1)) {
             return TaskState.BANKING_FAILSAFE;
         }
         return TaskState.CLOSING_BANK;
