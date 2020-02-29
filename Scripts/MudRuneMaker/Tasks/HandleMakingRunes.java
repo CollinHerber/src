@@ -1,6 +1,7 @@
 package scripts.MudRuneMaker.Tasks;
 
 import org.tribot.api.General;
+import org.tribot.api.Timing;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Objects;
@@ -22,6 +23,10 @@ public class HandleMakingRunes implements Task {
     public static final RSTile stuckPositionEast = new RSTile( 2659, 4836, 0);
     public static final RSTile stuckPositionWest = new RSTile( 2657, 4836, 0);
     public static final RSTile fixStuckPosition = new RSTile( 2658, 4839, 0);
+
+    public static int mudRunesMade;
+    public static int pureEssUsed;
+    public static int waterTalismanUsed;
 
     public String[] watertalisman = {"Water talisman"};
     public String[] pureEssence = {"Pure essence"};
@@ -62,13 +67,22 @@ public class HandleMakingRunes implements Task {
                             RSObject[] earthAltar = Objects.find(30, "Altar");
                             if (earthAltar != null) {
                                 if (!earthAltar[0].isClickable() && earthAltar[0].adjustCameraTo()){
-                                    General.sleep(862, 1323);
+                                    Timing.waitCondition(() -> {
+                                        General.sleep(General.randomSD(750, 75));
+                                        return earthAltar[0].isClickable();
+                                    }, General.random(2000, 3000));
                                 }
                                      if (earthAltar[0].click("Use Water talisman -> " + earthAltar[0].getDefinition().getName())) {
-                                         General.sleep(3500, 4230);
-                                         Antiban.timedActions();
-                                          General.println("Making Mud runes.");
+                                         Timing.waitCondition(() -> {
+                                             General.sleep(General.randomSD(3700, 50));
+                                             return Inventory.find("Mud rune").length > 0;
+                                         }, General.random(5000, 6000));
+                                         mudRunesMade += 25;
+                                         pureEssUsed += 25;
+                                         waterTalismanUsed +=1;
 
+                                         Antiban.timedActions();
+                                         General.println("Making Mud runes.");
                                 }
                             }
                         }
