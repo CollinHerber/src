@@ -19,8 +19,6 @@ import scripts.MudRuneMaker.entityselector.finders.prefabs.ItemEntity;
 
 public class HandleBanking implements Task {
 
-    public static final RSArea VARROCK_TELEPORT_AREA = new RSArea(new RSTile[]{new RSTile(3206, 3421, 0), new RSTile(3220, 3421, 0), new RSTile(3221, 3438, 0), new RSTile(3205, 3438, 0)});
-
     public final String[] bindingNecklace = {"Binding necklace"};
     public String[] inventoryItems = {"Varrock teleport", "Water rune"};
     public String[] pureEssence = {"Pure essence"};
@@ -279,5 +277,3 @@ public class HandleBanking implements Task {
         return TaskState.CLOSING_BANK;
     }
 }
-
-
