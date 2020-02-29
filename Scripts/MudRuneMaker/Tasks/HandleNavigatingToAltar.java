@@ -1,6 +1,7 @@
 package scripts.MudRuneMaker.Tasks;
 
 import org.tribot.api.General;
+import org.tribot.api.Timing;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Objects;
@@ -20,11 +21,12 @@ public class HandleNavigatingToAltar implements Task {
 
     public String[] pureEssence = {"Pure essence"};
     public String[] watertalisman = {"Water talisman"};
-    public RSObject[] altar = Objects.find(50, "Mysterious ruins");
 
 
     public static final RSArea earthAltarOutsideArea = new RSArea(new RSTile [] { new RSTile(3303, 3475, 0),new RSTile(3298, 3470, 0),new RSTile(3299, 3467, 0),new RSTile(3306, 3466, 0),new RSTile(3309, 3472, 0),new RSTile(3306, 3473, 0) });
     public static final RSTile earthAltarEntrance = new RSTile( 3305, 3472, 0);
+    public static final RSArea insideEarthAltar = new RSArea(new RSTile[]{new RSTile(2650, 4845, 0), new RSTile(2664, 4844, 0), new RSTile(2664, 4831, 0), new RSTile(2661, 4826, 0), new RSTile(2653, 4826, 0), new RSTile(2651, 4832, 0)});
+
 
     public transient int run_at = PersistantABCUtil.getRunPercentage();
 
@@ -67,11 +69,19 @@ public class HandleNavigatingToAltar implements Task {
 
             case ENTERING_ALTAR:
 
+                RSObject[] altar = Objects.find(15, "Mysterious ruins");
+
+                if (earthAltarOutsideArea.contains(Player.getPosition())) {
                     if (altar != null && altar[0].isClickable()) {
-                        if (altar[0].click("Enter")) ;
-                        General.sleep(1600, 3000);
+                        if (altar[0].click("Enter")) {
+                            Timing.waitCondition(() -> {
+                                General.sleep(General.randomSD(750, 75));
+                                return insideEarthAltar.contains(Player.getPosition());
+                            }, General.random(2000, 3000));
+                        }
                         General.println("Clicking on altar");
                     }
+                }
                 break;
 
             case PRINT_OUT:
@@ -93,7 +103,7 @@ public class HandleNavigatingToAltar implements Task {
         if (Inventory.find(pureEssence).length == 25 && Inventory.find(watertalisman).length == 1 && !earthAltarOutsideArea.contains(Player.getPosition())) {
             return TaskState.WALKING_TO_ALTAR;
         }
-        if (altar[0].isOnScreen() && altar[0].isClickable() || earthAltarOutsideArea.contains(Player.getPosition())) {
+        if (earthAltarOutsideArea.contains(Player.getPosition())) {
             return TaskState.ENTERING_ALTAR;
         }
         return TaskState.PRINT_OUT;
