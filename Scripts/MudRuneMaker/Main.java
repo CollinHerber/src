@@ -10,10 +10,14 @@ import org.tribot.script.interfaces.Painting;
 
 import scripts.MudRuneMaker.Antiban.Antiban;
 import scripts.MudRuneMaker.Antiban.PersistantABCUtil;
+
 import scripts.MudRuneMaker.Tasks.HandleBanking;
 import scripts.MudRuneMaker.Tasks.HandleMakingRunes;
 import scripts.MudRuneMaker.Tasks.HandleNavigatingToAltar;
 import scripts.MudRuneMaker.Tasks.HandleNavigatingToBank;
+
+import scripts.MudRuneMaker.api.rsitem_services.GrandExchange;
+
 import scripts.MudRuneMaker.data.MyDaxCredentials;
 import scripts.MudRuneMaker.framework.Task;
 import scripts.MudRuneMaker.data.Vars;
@@ -21,7 +25,6 @@ import scripts.MudRuneMaker.data.Vars;
 import scripts.dax_api.api_lib.DaxWalker;
 import scripts.dax_api.api_lib.models.DaxCredentials;
 import scripts.dax_api.api_lib.models.DaxCredentialsProvider;
-import scripts.wastedbro.api.rsitem_services.GrandExchange;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,7 +37,6 @@ public class Main extends Script implements Painting {
     private long startTime;
     private ArrayList<Task> tasks = new ArrayList<>();
     public int speed = General.random(136, 143);
-    public double xpPerRune= 9.3;
     private int startRunecraftingXP = Skills.getXP(Skills.SKILLS.RUNECRAFTING);
 
     private static int costOfRune = 0;
