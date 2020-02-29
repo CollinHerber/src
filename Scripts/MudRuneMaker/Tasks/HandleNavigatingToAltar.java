@@ -22,7 +22,6 @@ public class HandleNavigatingToAltar implements Task {
     public String[] pureEssence = {"Pure essence"};
     public String[] watertalisman = {"Water talisman"};
 
-
     public static final RSArea earthAltarOutsideArea = new RSArea(new RSTile [] { new RSTile(3303, 3475, 0),new RSTile(3298, 3470, 0),new RSTile(3299, 3467, 0),new RSTile(3306, 3466, 0),new RSTile(3309, 3472, 0),new RSTile(3306, 3473, 0) });
     public static final RSTile earthAltarEntrance = new RSTile( 3305, 3472, 0);
     public static final RSArea insideEarthAltar = new RSArea(new RSTile[]{new RSTile(2650, 4845, 0), new RSTile(2664, 4844, 0), new RSTile(2664, 4831, 0), new RSTile(2661, 4826, 0), new RSTile(2653, 4826, 0), new RSTile(2651, 4832, 0)});
@@ -109,4 +108,3 @@ public class HandleNavigatingToAltar implements Task {
         return TaskState.PRINT_OUT;
         }
 }
-
