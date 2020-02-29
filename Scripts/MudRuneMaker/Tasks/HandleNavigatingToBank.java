@@ -1,6 +1,7 @@
 package scripts.MudRuneMaker.Tasks;
 
 import org.tribot.api.General;
+import org.tribot.api.Timing;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
 
@@ -17,6 +18,7 @@ public class HandleNavigatingToBank implements Task {
 
     public String[] pureEssence = {"Pure essence"};
     public transient int run_at = PersistantABCUtil.getRunPercentage();
+    public static int varrockTabUsed;
 
 
     @Override
@@ -44,12 +46,16 @@ public class HandleNavigatingToBank implements Task {
                 DaxWalker.walkToBank(RunescapeBank.VARROCK_EAST);
                 if (Game.getRunEnergy() >= run_at) {
                     if (!Game.isRunOn()) {
-                        PersistantABCUtil.activateRun();
+                        Timing.waitCondition(() -> {
+                            General.sleep(General.randomSD(600, 25));
+                            return PersistantABCUtil.activateRun();
+                        }, General.random(2000, 3000));
                         General.println("Turning on run.");
                         PersistantABCUtil.generateRunPercentage();
                         General.println("Generating new run percentage.");
                     }
                 }
+                varrockTabUsed += 1;
                 General.println("Returning to Varrock East Bank");
                 PersistantABCUtil.handleIdleActions();
                 Antiban.moveCamera();
